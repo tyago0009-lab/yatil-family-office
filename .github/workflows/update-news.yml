@@ -1,0 +1,36 @@
+name: Atualizar Notícias Imobiliárias
+
+on:
+  schedule:
+    # Roda às 10h, 15h e 21h UTC (= 7h, 12h e 18h horário de Brasília)
+    - cron: '0 10,15,21 * * *'
+  workflow_dispatch:  # permite disparo manual
+
+jobs:
+  fetch-news:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install feedparser --quiet
+
+      - name: Buscar notícias
+        run: python3 fetch_news.py
+
+      - name: Commit e push news.json
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add news.json
+          git diff --staged --quiet || git commit -m "auto: notícias imobiliárias $(date +'%d/%m %H:%M')"
+          git push

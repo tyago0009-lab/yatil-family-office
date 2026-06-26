@@ -217,7 +217,8 @@ function renderPainel(){
 
   document.getElementById('painel').innerHTML = `
   <div class="news-header">
-    <h3 style="margin:0">◆ Notícias Imobiliárias do Dia</h3>
+    <h3 style="margin:0">◆ Notícias Imobiliárias — Últimos 30 Dias</h3>
+    <span id="news-updated" style="font-size:10px;color:#6e7681;margin-left:8px"></span>
     <button class="news-refresh" onclick="loadNews(true)">⟳ Atualizar</button>
   </div>
   <div class="news-grid" id="news-grid"><div class="news-loading">Carregando notícias...</div></div>
@@ -235,50 +236,37 @@ function renderPainel(){
   `;
 }
 
-// News fetch
+// News — lê de ./news.json gerado pelo GitHub Action
 async function loadNews(force){
   if(!force && window._newsLoaded) return;
   window._newsLoaded = true;
   const grid = document.getElementById('news-grid');
   if(!grid) return;
-  grid.innerHTML = '<div class="news-loading">🔄 Buscando notícias...</div>';
-
-  const feeds = [
-    'https://news.google.com/rss/search?q=mercado+imobili%C3%A1rio+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419',
-    'https://www.infomoney.com.br/rss/',
-    'https://rss.g1.globo.com/globo/economia/rss2.xml',
-  ];
-
-  for(const feed of feeds){
-    try{
-      const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed)}&count=7`;
-      const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
-      const data = await r.json();
-      if(data.status==='ok' && data.items && data.items.length > 0){
-        renderNewsCards(data.items.slice(0,7));
-        return;
-      }
-    }catch(e){ continue; }
-  }
-  grid.innerHTML = '<div class="news-err">⚠ Não foi possível carregar notícias. Verifique a conexão e tente novamente.</div>';
-}
-
-function renderNewsCards(items){
-  const grid = document.getElementById('news-grid');
-  if(!grid) return;
-  grid.innerHTML = items.map(item=>{
-    const date = item.pubDate ? new Date(item.pubDate).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
-    const raw = item.description||'';
-    const desc = raw.replace(/<[^>]*>/g,'').replace(/&[a-z]+;/g,' ').trim().slice(0,140);
-    const src = item.author||new URL(item.link||'https://news.google.com').hostname.replace('www.','');
-    const title = (item.title||'').replace(/&[a-z]+;/g,' ');
-    return `<div class="news-card" onclick="window.open('${item.link}','_blank')">
-      <div class="news-src">${src}</div>
-      <div class="news-title">${title}</div>
-      <div class="news-desc">${desc||'Clique para ler mais...'}</div>
-      <div class="news-date">${date}</div>
+  grid.innerHTML = '<div class="news-loading">🔄 Carregando notícias...</div>';
+  try{
+    const r = await fetch('./news.json?t='+Date.now(), {cache:'no-store'});
+    if(!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    if(!data.items||!data.items.length) throw new Error('empty');
+    const upd = document.getElementById('news-updated');
+    if(upd) upd.textContent = 'Atualizado: '+(data.updated||'');
+    grid.innerHTML = data.items.map(item=>{
+      const date = item.date ? new Date(item.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'2-digit'}) : '';
+      const safeLink = (item.link||'#').replace(/'/g,'%27');
+      return `<div class="news-card" onclick="window.open('${safeLink}','_blank')">
+        <div class="news-src">${item.source||''}</div>
+        <div class="news-title">${item.title||''}</div>
+        <div class="news-desc">${item.summary||'Clique para ler mais...'}</div>
+        <div class="news-date">${date}</div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    const grid2 = document.getElementById('news-grid');
+    if(grid2) grid2.innerHTML = `<div class="news-err" style="grid-column:1/-1">
+      ⏳ Notícias ainda não disponíveis — a primeira busca automática ocorrerá às <strong>7h, 12h ou 18h</strong> (horário de Brasília).<br>
+      <small style="color:#6e7681">Para adiantar: acesse o repositório no GitHub → Actions → "Atualizar Notícias" → Run workflow</small>
     </div>`;
-  }).join('');
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════
