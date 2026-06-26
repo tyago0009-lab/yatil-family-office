@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Family Office — Grupo Yatil</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d1117;color:#e2e8f0;font-size:13px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+a{color:#60a5fa;text-decoration:none}a:hover{text-decoration:underline}
+/* Header */
+#hdr{background:#161b22;border-bottom:1px solid #30363d;padding:9px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+#hdr .logo{font-size:16px;font-weight:700;color:#58a6ff}
+#hdr .sub{font-size:11px;color:#8b949e}
+#hdr .stamp{margin-left:auto;font-size:11px;color:#6e7681;white-space:nowrap}
+/* Nav */
+#nav{background:#161b22;border-bottom:1px solid #30363d;display:flex;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tab{padding:10px 18px;cursor:pointer;color:#8b949e;font-size:12.5px;font-weight:500;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s;user-select:none}
+.tab:hover{color:#e6edf3;background:rgba(255,255,255,.04)}
+.tab.on{color:#58a6ff;border-bottom-color:#58a6ff}
+/* Main scroll area */
+#main{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px 18px 8px}
+.pane{display:none}.pane.on{display:block}
+/* Section titles */
+h3{font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin:22px 0 10px}
+h3:first-child{margin-top:0}
+/* KPI cards */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-bottom:20px}
+.kcard{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:13px 15px}
+.klabel{font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kval{font-size:19px;font-weight:700;color:#e6edf3;font-variant-numeric:tabular-nums}
+.ksub{font-size:10px;color:#6e7681;margin-top:2px}
+.kval.green{color:#3fb950}.kval.blue{color:#58a6ff}.kval.yellow{color:#e3b341}.kval.red{color:#f85149}
+/* Status badges */
+.b{display:inline-block;padding:1px 7px;border-radius:4px;font-size:10.5px;font-weight:600;white-space:nowrap}
+.b-venda{background:#1f3666;color:#79b8ff}.b-estoque{background:#282d36;color:#8b949e}
+.b-uso{background:#3b1f5e;color:#c084fc}.b-locado{background:#0d3122;color:#56d364}
+.b-disp{background:#0d2f2f;color:#39d353}.b-excl{background:#3d2800;color:#e3b341}
+/* Filters */
+.fbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.fbar select,.fbar input{background:#161b22;border:1px solid #30363d;color:#e2e8f0;padding:5px 9px;border-radius:6px;font-size:12px;outline:none}
+.fbar input{min-width:160px}
+.fbar select:focus,.fbar input:focus{border-color:#58a6ff}
+.btn{background:#1f3666;border:1px solid #388bfd;color:#79b8ff;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#2d4d8a}
+.btn.red{background:#3d0d0d;border-color:#f85149;color:#f85149}
+.btn.green{background:#0d3122;border-color:#3fb950;color:#3fb950}
+.cnt-lbl{color:#6e7681;font-size:11px}
+/* Totals bar */
+.tbar{display:flex;flex-wrap:wrap;gap:14px;background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px 15px;margin-bottom:14px}
+.ti .tv{font-size:13px;font-weight:700;color:#e6edf3;font-variant-numeric:tabular-nums}
+.ti .tl{font-size:10px;color:#6e7681;margin-top:1px}
+/* Table wrapper — KEY FIX: max-height so scrollbar stays in viewport */
+.tw{overflow:auto;border:1px solid #30363d;border-radius:8px;max-height:calc(100vh - 195px)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:#1c2128;color:#8b949e;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;text-align:left;white-space:nowrap;border-bottom:1px solid #30363d;position:sticky;top:0;z-index:2}
+thead th.r{text-align:right}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+tbody tr{border-bottom:1px solid #1c2128}
+td{padding:6px 10px;color:#cdd9e5;white-space:nowrap}
+td.r{text-align:right;font-variant-numeric:tabular-nums}
+td.gray{color:#6e7681}td.green{color:#3fb950}td.red{color:#f85149}td.yellow{color:#e3b341}
+/* Section rows in tables */
+.sec-row td{background:#1a2433;color:#58a6ff;font-size:11px;font-weight:600;padding:5px 10px}
+/* Subtotal / tfoot */
+tfoot tr td{background:#1c2433;color:#79b8ff;font-weight:700;border-top:2px solid #30363d;padding:7px 10px;font-variant-numeric:tabular-nums;position:sticky;bottom:0;z-index:1}
+tfoot .tfl{color:#6e7681;font-size:11px}
+/* Edit row */
+.edit-row td{background:#0d1621;padding:10px;border-bottom:2px solid #388bfd}
+.edit-form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.edit-field{display:flex;flex-direction:column;gap:3px}
+.edit-field label{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:.4px}
+.edit-field input,.edit-field textarea{background:#161b22;border:1px solid #30363d;color:#e2e8f0;padding:5px 8px;border-radius:5px;font-size:12px;width:140px;outline:none}
+.edit-field input:focus,.edit-field textarea:focus{border-color:#58a6ff}
+.edit-field textarea{resize:vertical;height:52px;width:220px}
+/* Modal overlay */
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900}
+#pct-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1c2128;border:1px solid #388bfd;border-radius:12px;padding:22px;z-index:901;min-width:300px}
+#pct-modal h4{color:#e6edf3;margin-bottom:8px;font-size:14px}
+#pct-modal p{color:#8b949e;font-size:11px;margin-bottom:14px;line-height:1.5}
+#pct-modal .row{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+#pct-modal input{background:#0d1117;border:1px solid #30363d;color:#e6edf3;padding:8px 10px;border-radius:6px;width:90px;font-size:15px;outline:none}
+#pct-modal input:focus{border-color:#58a6ff}
+#pct-modal .btns{display:flex;gap:8px;justify-content:flex-end}
+/* Semáforo colors */
+.sem-r{color:#f85149;font-weight:700}.sem-y{color:#e3b341;font-weight:600}.sem-g{color:#3fb950}
+/* News grid */
+.news-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.news-refresh{background:transparent;border:1px solid #30363d;color:#8b949e;padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer}
+.news-refresh:hover{border-color:#58a6ff;color:#58a6ff}
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.news-card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:13px;cursor:pointer;transition:border-color .15s}
+.news-card:hover{border-color:#58a6ff}
+.news-src{font-size:9px;color:#58a6ff;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;font-weight:600}
+.news-title{font-size:12.5px;font-weight:600;color:#e6edf3;line-height:1.4;margin-bottom:5px}
+.news-desc{font-size:11px;color:#8b949e;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.news-date{font-size:10px;color:#6e7681;margin-top:6px}
+.news-loading{color:#6e7681;padding:30px;text-align:center;grid-column:1/-1}
+.news-err{color:#f85149;font-size:12px;padding:20px;grid-column:1/-1}
+/* Checkboxes */
+.cb{width:14px;height:14px;cursor:pointer;accent-color:#58a6ff}
+/* Print styles */
+@media print{
+  #hdr,#nav,.fbar,.tbar,.print-bar,tfoot,#overlay,#pct-modal{display:none!important}
+  body{background:#fff;color:#000;overflow:visible}
+  #main{overflow:visible;padding:0}
+  .pane{display:block!important}
+  .sec-row{display:none!important}
+  .tw{max-height:none;overflow:visible;border:none}
+  table{font-size:10px}
+  thead th{background:#f5f5f5;color:#333;border-bottom:1px solid #ccc}
+  td{color:#333;border-bottom:1px solid #eee}
+  .b{border:1px solid #999}
+  .b-venda,.b-estoque,.b-uso,.b-locado,.b-disp,.b-excl{background:transparent;color:#333}
+  a{color:#333}
+}
+@media(max-width:600px){
+  #main{padding:10px 8px}
+  .tw{max-height:calc(100vh - 180px)}
+  .news-grid{grid-template-columns:1fr}
+  .kgrid{grid-template-columns:1fr 1fr}
+  .kval{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <span class="logo">🏠 Grupo Yatil</span>
+  <span class="sub">Family Office · Controladoria</span>
+  <span class="stamp" id="stamp"></span>
+</div>
+
+<div id="nav">
+  <div class="tab on"  onclick="go('painel',this)">📊 Painel</div>
+  <div class="tab" onclick="go('comercial',this)">🏢 Comercial</div>
+  <div class="tab" onclick="go('patrimonio',this)">📦 Patrimônio</div>
+  <div class="tab" onclick="go('cartas',this)">🃏 Cartas</div>
+  <div class="tab" onclick="go('vendidos',this)">✅ Vendidos</div>
+</div>
+
+<div id="main">
+  <div id="painel"     class="pane on"></div>
+  <div id="comercial"  class="pane"></div>
+  <div id="patrimonio" class="pane"></div>
+  <div id="cartas"     class="pane"></div>
+  <div id="vendidos"   class="pane"></div>
+</div>
+
+<!-- % Valorização Modal -->
+<div id="overlay" onclick="closePctModal()"></div>
+<div id="pct-modal">
+  <h4>✏ Aplicar Valorização %</h4>
+  <p id="pct-desc">Empreendimento selecionado</p>
+  <div class="row">
+    <input id="pct-input" type="number" step="0.1" min="-50" max="500" placeholder="0.0">
+    <span style="color:#e6edf3;font-size:14px">%</span>
+    <span style="color:#6e7681;font-size:11px">sobre o Valor Atual</span>
+  </div>
+  <div class="btns">
+    <button onclick="closePctModal()" style="background:transparent;border:1px solid #30363d;color:#8b949e;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px">Cancelar</button>
+    <button onclick="applyPct()" class="btn">Aplicar a todos</button>
+  </div>
+</div>
+
+<script>
+const D0 = {"patrimonio":[{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"301","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":233.31,"area_tot":393.68,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2371500,"pct_marg_tabela":0.25,"valor_tabela":2964375,"desc_max":592875,"rpsm2_total":6023.928063401748,"rpsm2_int":10164.587887360165,"valorizacao_pct":0.581,"tempo_anos":6.98425735797399,"pct_ao_ano":0.08318708349666797,"loc_base":11857.5,"pct_marg_loc":0.1,"loc_tabela":13043.250000000002,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 3° pav.","link_venda":"https://yatil.com.br/imovel/apartamento-4-suites-new-village-concept-vila-nova-jaraguadosul","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"302 GARDEN","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":391.26,"area_tot":551.63,"data_aquis":"2019-07-01","valor_inicial":1950000,"valor_pretend":2925000,"valor_atual":3487500,"pct_marg_tabela":0.25,"valor_tabela":4359375,"desc_max":871875,"rpsm2_total":6322.1724706778095,"rpsm2_int":8913.51019782242,"valorizacao_pct":0.7884615384615384,"tempo_anos":6.98425735797399,"pct_ao_ano":0.11289124928384042,"loc_base":17437.5,"pct_marg_loc":0.1,"loc_tabela":19181.25,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Garden 2° pav.","link_venda":"https://yatil.com.br/imovel/apartamento-garden-de-4-suites-a-venda-em-vila-nova-jaragua-do-sul-new-village-residence/249","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"401","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":233.31,"area_tot":393.68,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2427300,"pct_marg_tabela":0.25,"valor_tabela":3034125,"desc_max":606825,"rpsm2_total":6165.667547246495,"rpsm2_int":10403.754661180403,"valorizacao_pct":0.6182,"tempo_anos":6.98425735797399,"pct_ao_ano":0.08851334770678165,"loc_base":12136.5,"pct_marg_loc":0.1,"loc_tabela":13350.150000000001,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 4° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"402","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":243.75,"area_tot":404.12,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2497050,"pct_marg_tabela":0.25,"valor_tabela":3121312.5,"desc_max":624262.5,"rpsm2_total":6178.9814906463425,"rpsm2_int":10244.307692307691,"valorizacao_pct":0.6647,"tempo_anos":6.98425735797399,"pct_ao_ano":0.09517117796942375,"loc_base":12485.25,"pct_marg_loc":0.1,"loc_tabela":13733.775000000001,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 4° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"501","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":233.31,"area_tot":393.68,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2483100,"pct_marg_tabela":0.25,"valor_tabela":3103875,"desc_max":620775,"rpsm2_total":6307.407031091241,"rpsm2_int":10642.921435000642,"valorizacao_pct":0.6554,"tempo_anos":6.98425735797399,"pct_ao_ano":0.09383961191689533,"loc_base":12415.5,"pct_marg_loc":0.1,"loc_tabela":13657.050000000001,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 5° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"502","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":243.75,"area_tot":404.12,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2552850,"pct_marg_tabela":0.25,"valor_tabela":3191062.5,"desc_max":638212.5,"rpsm2_total":6317.059289320004,"rpsm2_int":10473.23076923077,"valorizacao_pct":0.7019,"tempo_anos":6.98425735797399,"pct_ao_ano":0.10049744217953743,"loc_base":12764.25,"pct_marg_loc":0.1,"loc_tabela":14040.675000000001,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 5° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"601","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":233.31,"area_tot":393.68,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2538900,"pct_marg_tabela":0.25,"valor_tabela":3173625,"desc_max":634725,"rpsm2_total":6449.146514935988,"rpsm2_int":10882.088208820882,"valorizacao_pct":0.6926,"tempo_anos":6.98425735797399,"pct_ao_ano":0.09916587612700901,"loc_base":12694.5,"pct_marg_loc":0.1,"loc_tabela":13963.95,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 6° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"602","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":243.75,"area_tot":404.12,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2608650,"pct_marg_tabela":0.25,"valor_tabela":3260812.5,"desc_max":652162.5,"rpsm2_total":6455.137087993665,"rpsm2_int":10702.153846153846,"valorizacao_pct":0.7391,"tempo_anos":6.98425735797399,"pct_ao_ano":0.10582370638965112,"loc_base":13043.25,"pct_marg_loc":0.1,"loc_tabela":14347.575,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 6° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"701","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":233.31,"area_tot":393.68,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2594700,"pct_marg_tabela":0.25,"valor_tabela":3243375,"desc_max":648675,"rpsm2_total":6590.8859987807355,"rpsm2_int":11121.254982641121,"valorizacao_pct":0.7298,"tempo_anos":6.98425735797399,"pct_ao_ano":0.1044921403371227,"loc_base":12973.5,"pct_marg_loc":0.1,"loc_tabela":14270.85,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 7° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"ESTOQUE","imovel":"NVC","unidade":"702","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":243.75,"area_tot":404.12,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2664450,"pct_marg_tabela":0.25,"valor_tabela":3330562.5,"desc_max":666112.5,"rpsm2_total":6593.214886667326,"rpsm2_int":10931.076923076924,"valorizacao_pct":0.7763,"tempo_anos":6.98425735797399,"pct_ao_ano":0.1111499705997648,"loc_base":13322.25,"pct_marg_loc":0.1,"loc_tabela":14654.475,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 7° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"ESTOQUE","imovel":"NVC","unidade":"801","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":233.31,"area_tot":393.68,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2650500,"pct_marg_tabela":0.25,"valor_tabela":3313125,"desc_max":662625,"rpsm2_total":6732.625482625483,"rpsm2_int":11360.421756461361,"valorizacao_pct":0.767,"tempo_anos":6.98425735797399,"pct_ao_ano":0.10981840454723638,"loc_base":13252.5,"pct_marg_loc":0.1,"loc_tabela":14577.750000000002,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 8° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"ESTOQUE","imovel":"NVC","unidade":"802","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":243.75,"area_tot":404.12,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2720250,"pct_marg_tabela":0.25,"valor_tabela":3400312.5,"desc_max":680062.5,"rpsm2_total":6731.292685340988,"rpsm2_int":11160,"valorizacao_pct":0.8135,"tempo_anos":6.98425735797399,"pct_ao_ano":0.11647623480987848,"loc_base":13601.25,"pct_marg_loc":0.1,"loc_tabela":14961.375000000002,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 8° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"ESTOQUE","imovel":"NVC","unidade":"901","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":233.31,"area_tot":393.68,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2706300,"pct_marg_tabela":0.25,"valor_tabela":3382875,"desc_max":676575,"rpsm2_total":6874.36496647023,"rpsm2_int":11599.588530281599,"valorizacao_pct":0.8042,"tempo_anos":6.98425735797399,"pct_ao_ano":0.11514466875735006,"loc_base":13531.5,"pct_marg_loc":0.1,"loc_tabela":14884.650000000001,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 9° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"ESTOQUE","imovel":"NVC","unidade":"902","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":243.75,"area_tot":404.12,"data_aquis":"2019-07-01","valor_inicial":1500000,"valor_pretend":2250000,"valor_atual":2776050,"pct_marg_tabela":0.25,"valor_tabela":3470062.5,"desc_max":694012.5,"rpsm2_total":6869.370484014649,"rpsm2_int":11388.923076923076,"valorizacao_pct":0.8507,"tempo_anos":6.98425735797399,"pct_ao_ano":0.12180249901999216,"loc_base":13880.25,"pct_marg_loc":0.1,"loc_tabela":15268.275000000001,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Suspensa 9° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — NVC New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"1001 PENTHOUSE","disposicao":"4 Suítes","vagas":3,"matricula":null,"area_int":474.47,"area_tot":634.84,"data_aquis":"2019-07-01","valor_inicial":4000000,"valor_pretend":6000000,"valor_atual":5577210,"pct_marg_tabela":0.25,"valor_tabela":6971512.5,"desc_max":1394302.5,"rpsm2_total":8785.221473127087,"rpsm2_int":11754.610407401942,"valorizacao_pct":0.3943025,"tempo_anos":6.98425735797399,"pct_ao_ano":0.05645589499215994,"loc_base":27886.05,"pct_marg_loc":0.1,"loc_tabela":30674.655000000002,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Penthouse duplex 10°/11°","link_venda":"https://yatil.com.br/imovel/cobertura-duplex-4-suites-vila-nova-jaragua-do-sul","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — JF Pradi Residence","status":"À VENDA","imovel":"JF PRADI","unidade":"502","disposicao":"3 Suítes","vagas":2,"matricula":null,"area_int":136.25,"area_tot":201.81,"data_aquis":"2016-01-01","valor_inicial":950000,"valor_pretend":1425000,"valor_atual":1113000,"pct_marg_tabela":0.15,"valor_tabela":1279950,"desc_max":166950,"rpsm2_total":5515.088449531738,"rpsm2_int":8168.807339449541,"valorizacao_pct":0.17157894736842105,"tempo_anos":10.480492813141684,"pct_ao_ano":0.016371267117637353,"loc_base":5565,"pct_marg_loc":0.07,"loc_tabela":5954.55,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"6° pav. | Disponível para visitas","link_venda":"https://yatil.com.br/imovel/apartamentojfpradi-3-suites-jf-pradi-centro-jaragua-do-sul","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — JF Pradi Residence","status":"À VENDA","imovel":"JF PRADI","unidade":"504","disposicao":"3 Suítes","vagas":2,"matricula":null,"area_int":136.25,"area_tot":201.81,"data_aquis":"2016-01-01","valor_inicial":950000,"valor_pretend":1425000,"valor_atual":1250000,"pct_marg_tabela":0.15,"valor_tabela":1437500,"desc_max":187500,"rpsm2_total":6193.944799563947,"rpsm2_int":9174.311926605504,"valorizacao_pct":0.3157894736842105,"tempo_anos":10.480492813141684,"pct_ao_ano":0.030131166474179176,"loc_base":6250,"pct_marg_loc":0.15,"loc_tabela":7187.499999999999,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado | proprietário morando visitas pontuais","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — JF Pradi Residence","status":"À VENDA","imovel":"JF PRADI","unidade":"VAGA","disposicao":"Vaga","vagas":0,"matricula":null,"area_int":null,"area_tot":null,"data_aquis":"2016-01-01","valor_inicial":50000,"valor_pretend":75000,"valor_atual":125000,"pct_marg_tabela":0.15,"valor_tabela":143750,"desc_max":18750,"rpsm2_total":0,"rpsm2_int":0,"valorizacao_pct":1.5,"tempo_anos":10.480492813141684,"pct_ao_ano":0.1431230407523511,"loc_base":350,"pct_marg_loc":0.1,"loc_tabela":385.00000000000006,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"6° pav. | Disponível","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — JF Pradi Residence","status":"À VENDA","imovel":"JF PRADI","unidade":"BOX","disposicao":"Box","vagas":0,"matricula":null,"area_int":null,"area_tot":null,"data_aquis":"2016-01-01","valor_inicial":10000,"valor_pretend":15000,"valor_atual":25000,"pct_marg_tabela":0.15,"valor_tabela":28749.999999999996,"desc_max":3749.9999999999964,"rpsm2_total":0,"rpsm2_int":0,"valorizacao_pct":1.5,"tempo_anos":10.480492813141684,"pct_ao_ano":0.1431230407523511,"loc_base":100,"pct_marg_loc":0.1,"loc_tabela":110.00000000000001,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"6° pav. | Disponível","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"EM USO","imovel":"S. PRADI","unidade":"101","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":123,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":650000,"pct_marg_tabela":0.15,"valor_tabela":747500,"desc_max":97500,"rpsm2_total":0,"rpsm2_int":5284.552845528456,"valorizacao_pct":0.8571428571428571,"tempo_anos":6.562628336755647,"pct_ao_ano":0.13060969068478456,"loc_base":3250,"pct_marg_loc":0.1,"loc_tabela":3575.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: cozinha, lavanderia, 2 banheiros (granito/MDF)","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":"102","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":123,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":650000,"pct_marg_tabela":0.15,"valor_tabela":747500,"desc_max":97500,"rpsm2_total":0,"rpsm2_int":5284.552845528456,"valorizacao_pct":0.8571428571428571,"tempo_anos":6.562628336755647,"pct_ao_ano":0.13060969068478456,"loc_base":3250,"pct_marg_loc":0.1,"loc_tabela":3575.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: cozinha, lavanderia, 2 banheiros (granito/MDF)","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":"103","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":100,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":600000,"pct_marg_tabela":0.15,"valor_tabela":690000,"desc_max":90000,"rpsm2_total":0,"rpsm2_int":6000,"valorizacao_pct":0.7142857142857143,"tempo_anos":6.562628336755647,"pct_ao_ano":0.10884140890398714,"loc_base":3000,"pct_marg_loc":0.1,"loc_tabela":3300.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: cozinha, lavanderia, 2 banheiros (granito/MDF)","link_venda":null,"link_locacao":"https://yatil.com.br/imovel/apartamento-para-alugar-no-bairro-centro-jaragua-do-sul-sc/114?sh=1","data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":"104","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":100,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":600000,"pct_marg_tabela":0.15,"valor_tabela":690000,"desc_max":90000,"rpsm2_total":0,"rpsm2_int":6000,"valorizacao_pct":0.7142857142857143,"tempo_anos":6.562628336755647,"pct_ao_ano":0.10884140890398714,"loc_base":3000,"pct_marg_loc":0.1,"loc_tabela":3300.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: cozinha, lavanderia, 2 banheiros (granito/MDF)","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":"201","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":113,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":650000,"pct_marg_tabela":0.15,"valor_tabela":747500,"desc_max":97500,"rpsm2_total":0,"rpsm2_int":5752.212389380531,"valorizacao_pct":0.8571428571428571,"tempo_anos":6.562628336755647,"pct_ao_ano":0.13060969068478456,"loc_base":3250,"pct_marg_loc":0.1,"loc_tabela":3575.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: cozinha, lavanderia, 2 banheiros (granito/MDF)","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":"202","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":113,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":650000,"pct_marg_tabela":0.15,"valor_tabela":747500,"desc_max":97500,"rpsm2_total":0,"rpsm2_int":5752.212389380531,"valorizacao_pct":0.8571428571428571,"tempo_anos":6.562628336755647,"pct_ao_ano":0.13060969068478456,"loc_base":3250,"pct_marg_loc":0.1,"loc_tabela":3575.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: cozinha, lavanderia, 2 banheiros (granito/MDF)","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":"203","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":100,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":600000,"pct_marg_tabela":0.15,"valor_tabela":690000,"desc_max":90000,"rpsm2_total":0,"rpsm2_int":6000,"valorizacao_pct":0.7142857142857143,"tempo_anos":6.562628336755647,"pct_ao_ano":0.10884140890398714,"loc_base":3000,"pct_marg_loc":0.1,"loc_tabela":3300.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: coz.+lav.+2 banheiros (granito/MDF)","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":204,"disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":100,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":600000,"pct_marg_tabela":0.15,"valor_tabela":690000,"desc_max":90000,"rpsm2_total":0,"rpsm2_int":6000,"valorizacao_pct":0.7142857142857143,"tempo_anos":6.562628336755647,"pct_ao_ano":0.10884140890398714,"loc_base":3000,"pct_marg_loc":0.1,"loc_tabela":3300.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: cozinha, lavanderia, 2 banheiros (granito/MDF)","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":"301","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":113,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":650000,"pct_marg_tabela":0.15,"valor_tabela":747500,"desc_max":97500,"rpsm2_total":0,"rpsm2_int":5752.212389380531,"valorizacao_pct":0.8571428571428571,"tempo_anos":6.562628336755647,"pct_ao_ano":0.13060969068478456,"loc_base":3250,"pct_marg_loc":0.1,"loc_tabela":3575.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: cozinha, lavanderia, 2 banheiros (granito/MDF)","link_venda":"https://yatil.com.br/imovel/apartamento-a-venda-no-bairro-centro-jaragua-do-sul-sc/204","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":"303","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":100,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":600000,"pct_marg_tabela":0.15,"valor_tabela":690000,"desc_max":90000,"rpsm2_total":0,"rpsm2_int":6000,"valorizacao_pct":0.7142857142857143,"tempo_anos":6.562628336755647,"pct_ao_ano":0.10884140890398714,"loc_base":3000,"pct_marg_loc":0.1,"loc_tabela":3300.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: coz.+lav.+2 banheiros (granito/MDF)","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — S. Pradi Residence","status":"LOCADO","imovel":"S. PRADI","unidade":"304","disposicao":"1s+2q","vagas":1,"matricula":null,"area_int":100,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":350000,"valor_pretend":525000,"valor_atual":600000,"pct_marg_tabela":0.15,"valor_tabela":690000,"desc_max":90000,"rpsm2_total":0,"rpsm2_int":6000,"valorizacao_pct":0.7142857142857143,"tempo_anos":6.562628336755647,"pct_ao_ano":0.10884140890398714,"loc_base":3000,"pct_marg_loc":0.1,"loc_tabela":3300.0000000000005,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Semimobiliado: coz.+lav.+2 banheiros (granito/MDF)","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Apartamentos Avulsos","status":"EM USO","imovel":"EMENDOERFER H. CLUB","unidade":"204","disposicao":"1s+2q","vagas":2,"matricula":"77.116","area_int":84,"area_tot":127,"data_aquis":"2020-09-15","valor_inicial":380000,"valor_pretend":570000,"valor_atual":690000,"pct_marg_tabela":0.2,"valor_tabela":828000,"desc_max":138000,"rpsm2_total":5433.070866141732,"rpsm2_int":8214.285714285714,"valorizacao_pct":0.8157894736842105,"tempo_anos":5.774127310061601,"pct_ao_ano":0.1412835966160066,"loc_base":3450,"pct_marg_loc":0.3,"loc_tabela":4485,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Mobiliado 3° pav. proprietário morando visitas pontuais","link_venda":"https://yatil.com.br/imovel/apartamento-de-3-quartos-semimobiliado-a-venda-com-lazer-completo-em-jaragua-do-sul/AP0012","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Apartamentos Avulsos","status":"DISPONÍVEL","imovel":"SAINT SEBASTIAN","unidade":"611","disposicao":"1 Suíte","vagas":1,"matricula":"64.697","area_int":60.03,"area_tot":105.65,"data_aquis":"2024-10-28","valor_inicial":480000,"valor_pretend":720000,"valor_atual":550000,"pct_marg_tabela":0.2,"valor_tabela":660000,"desc_max":110000,"rpsm2_total":5205.868433506862,"rpsm2_int":9162.085623854739,"valorizacao_pct":0.14583333333333334,"tempo_anos":1.6563997262149213,"pct_ao_ano":0.08804235537190083,"loc_base":2750,"pct_marg_loc":0.4,"loc_tabela":3849.9999999999995,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Disponível: VENDA e LOCAÇÃO | est. R$ 3.500/mês","link_venda":"https://yatil.com.br/imovel/flat-saint-sebastian-jaragua-do-sul","link_locacao":"https://yatil.com.br/imovel/flat-mobiliado-centro-jaragua-do-sul","data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Boxes e Vagas","status":"DISPONÍVEL","imovel":"PEGASUS","unidade":"BOX 03","disposicao":"Box","vagas":0,"matricula":"82.436","area_int":2.45,"area_tot":9.82,"data_aquis":"2015-11-07","valor_inicial":2000,"valor_pretend":3000,"valor_atual":5000,"pct_marg_tabela":0.2,"valor_tabela":6000,"desc_max":1000,"rpsm2_total":509.1649694501018,"rpsm2_int":2040.816326530612,"valorizacao_pct":1.5,"tempo_anos":10.63107460643395,"pct_ao_ano":0.14109580221478238,"loc_base":25,"pct_marg_loc":null,"loc_tabela":null,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":6847.79,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Boxes e Vagas","status":"DISPONÍVEL","imovel":"PEGASUS","unidade":"VAGA 33","disposicao":"Vaga","vagas":0,"matricula":"82.432","area_int":12.25,"area_tot":17.38,"data_aquis":"01/01/2015","valor_inicial":15000,"valor_pretend":22500,"valor_atual":30000,"pct_marg_tabela":0.2,"valor_tabela":36000,"desc_max":6000,"rpsm2_total":1726.1219792865363,"rpsm2_int":2448.9795918367345,"valorizacao_pct":1,"tempo_anos":11.4798083504449,"pct_ao_ano":0.08710946816122109,"loc_base":150,"pct_marg_loc":0.2,"loc_tabela":180,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":12119.6,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Boxes e Vagas","status":"DISPONÍVEL","imovel":"PEGASUS","unidade":"VAGA 34","disposicao":"Vaga","vagas":0,"matricula":"82.433","area_int":12,"area_tot":17.13,"data_aquis":"01/01/2015","valor_inicial":15000,"valor_pretend":22500,"valor_atual":30000,"pct_marg_tabela":0.2,"valor_tabela":36000,"desc_max":6000,"rpsm2_total":1751.3134851138354,"rpsm2_int":2500,"valorizacao_pct":1,"tempo_anos":11.4798083504449,"pct_ao_ano":0.08710946816122109,"loc_base":150,"pct_marg_loc":0.2,"loc_tabela":180,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":"MENSAGEM AO SINDICO DISPONIBILIZANDO PARA LOCAÇÃO","data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Salas Comerciais","status":"EM USO","imovel":"MONTE OLIMPO","unidade":"SALA 01","disposicao":"Sala Comercial","vagas":0,"matricula":null,"area_int":67,"area_tot":null,"data_aquis":"2011-01-01","valor_inicial":180000,"valor_pretend":270000,"valor_atual":350000,"pct_marg_tabela":0.1,"valor_tabela":385000.00000000006,"desc_max":35000.00000000006,"rpsm2_total":0,"rpsm2_int":5223.880597014925,"valorizacao_pct":0.9444444444444444,"tempo_anos":15.4798083504449,"pct_ao_ano":0.061011378375191605,"loc_base":1750,"pct_marg_loc":0.2,"loc_tabela":2100,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Salas Comerciais","status":"EM USO","imovel":"MONTE OLIMPO","unidade":"SALA 02","disposicao":"Sala Comercial","vagas":0,"matricula":null,"area_int":90,"area_tot":null,"data_aquis":"2011-01-01","valor_inicial":200000,"valor_pretend":300000,"valor_atual":330000,"pct_marg_tabela":0.1,"valor_tabela":363000.00000000006,"desc_max":33000.00000000006,"rpsm2_total":0,"rpsm2_int":3666.6666666666665,"valorizacao_pct":0.65,"tempo_anos":15.4798083504449,"pct_ao_ano":0.04199018394057305,"loc_base":1650,"pct_marg_loc":0.2,"loc_tabela":1980,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Salas Comerciais","status":"LOCADO","imovel":"S. PRADI","unidade":"SALA 03","disposicao":"Sala Comercial","vagas":0,"matricula":null,"area_int":55,"area_tot":null,"data_aquis":"2019-12-02","valor_inicial":223530,"valor_pretend":335295,"valor_atual":331900,"pct_marg_tabela":0.1,"valor_tabela":365090.00000000006,"desc_max":33190.00000000006,"rpsm2_total":0,"rpsm2_int":6034.545454545455,"valorizacao_pct":0.48481188207399456,"tempo_anos":6.562628336755647,"pct_ao_ano":0.07387465161765812,"loc_base":1659.5,"pct_marg_loc":0.2,"loc_tabela":1991.3999999999999,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Frente rua","link_venda":null,"link_locacao":"https://yatil.com.br/imovel/loja-comercial-para-alugar-no-centro-de-jaragua-do-sul-localizacao-privilegiada/245","data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Casas","status":"DISPONÍVEL","imovel":"CASA ELEONORA","unidade":"198","disposicao":"4 Suítes","vagas":4,"matricula":"42.135","area_int":311,"area_tot":343.6,"data_aquis":"2008-01-01","valor_inicial":1020428,"valor_pretend":1530642,"valor_atual":2370000,"pct_marg_tabela":0.15,"valor_tabela":2725500,"desc_max":355500,"rpsm2_total":6897.55529685681,"rpsm2_int":7620.578778135048,"valorizacao_pct":1.3225548495337252,"tempo_anos":18.480492813141684,"pct_ao_ano":0.07156491241365824,"loc_base":11850,"pct_marg_loc":0.2,"loc_tabela":14220,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Piscina+Spa | Mobiliada","link_venda":"https://yatil.com.br/imovel/casa-alto-padrao-4-suites-centro-jaragua-do-sul","link_locacao":"https://yatil.com.br/imovel/casa-para-locacao-4-suites-piscina-aquecida-centro-jaragua-do-sul/341","data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Casas","status":"À VENDA","imovel":"CASA AZALEIA","unidade":"—","disposicao":"4 Suítes","vagas":5,"matricula":"40.533","area_int":440.78,"area_tot":974.37,"data_aquis":"2022-05-02","valor_inicial":2000000,"valor_pretend":3000000,"valor_atual":4799130,"pct_marg_tabela":0.15,"valor_tabela":5518999.5,"desc_max":719869.5,"rpsm2_total":4925.367160318975,"rpsm2_int":10887.81251417941,"valorizacao_pct":1.399565,"tempo_anos":4.147843942505133,"pct_ao_ano":0.33741987871287127,"loc_base":23995.65,"pct_marg_loc":0.2,"loc_tabela":28794.780000000002,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"EXCLUSIVO — proprietária morando. Somente venda.","link_venda":"https://yatil.com.br/imovel/casa-luxo-4-suites-condominio-azaleias-jaragua-do-sul","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Casas","status":"DISPONÍVEL","imovel":"CASA ALEXANDRIA","unidade":"11","disposicao":"3 Suítes","vagas":4,"matricula":"95.330","area_int":210.22,"area_tot":416.7,"data_aquis":"2023-04-14","valor_inicial":1380000,"valor_pretend":2070000,"valor_atual":1500000,"pct_marg_tabela":0.15,"valor_tabela":1724999.9999999998,"desc_max":224999.99999999977,"rpsm2_total":3599.712023038157,"rpsm2_int":7135.381980782038,"valorizacao_pct":0.08695652173913043,"tempo_anos":3.1978097193702943,"pct_ao_ano":0.027192525312686122,"loc_base":7500,"pct_marg_loc":0.2,"loc_tabela":9000,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Disponível: VENDA e LOCAÇÃO | Piscina+Ofurô","link_venda":"https://yatil.com.br/imovel/casa-com-piscina-barra-do-rio-cerro-jaragua-do-sul","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Terrenos","status":"EM USO","imovel":"TERRENO LaManu","unidade":"—","disposicao":"Terreno","vagas":0,"matricula":"75.565","area_int":421.58,"area_tot":421.58,"data_aquis":"2019-12-01","valor_inicial":223530,"valor_pretend":335295,"valor_atual":550000,"pct_marg_tabela":0.2,"valor_tabela":660000,"desc_max":110000,"rpsm2_total":1304.6159684994545,"rpsm2_int":1304.6159684994545,"valorizacao_pct":1.4605198407372613,"tempo_anos":6.565366187542779,"pct_ao_ano":0.22245824513314624,"loc_base":2750,"pct_marg_loc":0.2,"loc_tabela":3300,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Terreno do empreendimento LaManu","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Terrenos","status":"EM USO","imovel":"TERRENO SERENA","unidade":"—","disposicao":"Terreno","vagas":0,"matricula":"52.488","area_int":6038.83,"area_tot":6038.83,"data_aquis":"2021-03-23","valor_inicial":429977,"valor_pretend":644965.5,"valor_atual":800000,"pct_marg_tabela":0.2,"valor_tabela":960000,"desc_max":160000,"rpsm2_total":132.4759928661678,"rpsm2_int":132.4759928661678,"valorizacao_pct":0.8605646348525618,"tempo_anos":5.256673511293634,"pct_ao_ano":0.16370897545828034,"loc_base":4000,"pct_marg_loc":0.2,"loc_tabela":4800,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Terreno Cond. São Paulo","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Terrenos","status":"À VENDA","imovel":"HORIZONTES","unidade":"Lote 02","disposicao":"Terreno","vagas":0,"matricula":"54.164","area_int":1851.07,"area_tot":2294.52,"data_aquis":"2020-02-14","valor_inicial":700000,"valor_pretend":1050000,"valor_atual":1147500,"pct_marg_tabela":0.2,"valor_tabela":1377000,"desc_max":229500,"rpsm2_total":500.10459703990375,"rpsm2_int":619.9117267310259,"valorizacao_pct":0.6392857142857142,"tempo_anos":6.360027378507871,"pct_ao_ano":0.10051618904126437,"loc_base":5737.5,"pct_marg_loc":0.2,"loc_tabela":6885,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Cond. fechado | Baependi","link_venda":"https://yatil.com.br/imovel/terreno-condominio-alto-padrao-jaragua-do-sul-1851m2","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Terrenos","status":"DISPONÍVEL","imovel":"PIÇARRAS","unidade":"—","disposicao":"Terreno","vagas":0,"matricula":null,"area_int":444.75,"area_tot":630,"data_aquis":"2013-01-01","valor_inicial":350000,"valor_pretend":525000,"valor_atual":2916667,"pct_marg_tabela":0.2,"valor_tabela":3500000.4,"desc_max":583333.3999999999,"rpsm2_total":4629.630158730159,"rpsm2_int":6557.992130410343,"valorizacao_pct":7.333334285714286,"tempo_anos":13.478439425051334,"pct_ao_ano":0.5440788843910508,"loc_base":14583.335000000001,"pct_marg_loc":0.2,"loc_tabela":17500.002,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Beira-mar | Vista permanente","link_venda":"https://yatil.com.br/imovel/terreno-beira-mar-a-venda-em-balneario-picarras-vista-definitiva/317","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Terrenos","status":"DISPONÍVEL","imovel":"VIEIRAS ADOLFO TRIBESS","unidade":"—","disposicao":"Terreno","vagas":0,"matricula":"51.029/51.030","area_int":1548,"area_tot":1548,"data_aquis":"2008-01-01","valor_inicial":30000,"valor_pretend":45000,"valor_atual":1550000,"pct_marg_tabela":0.2,"valor_tabela":1860000,"desc_max":310000,"rpsm2_total":1001.2919896640827,"rpsm2_int":1001.2919896640827,"valorizacao_pct":50.666666666666664,"tempo_anos":18.480492813141684,"pct_ao_ano":2.7416296296296294,"loc_base":7750,"pct_marg_loc":0.2,"loc_tabela":9300,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":"https://yatil.com.br/imovel/terreno-a-venda-1548-m2-vieira-jaragua-do-sul-sc/TE0073","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  YATIL CONSTRUTORA — Terrenos","status":"DISPONÍVEL","imovel":"NOVICIADO","unidade":"—","disposicao":"Terreno","vagas":0,"matricula":"41.707","area_int":4300,"area_tot":10845.75,"data_aquis":"2008-01-01","valor_inicial":50000,"valor_pretend":75000,"valor_atual":750000,"pct_marg_tabela":0.2,"valor_tabela":900000,"desc_max":150000,"rpsm2_total":69.15151096051449,"rpsm2_int":174.41860465116278,"valorizacao_pct":14,"tempo_anos":18.480492813141684,"pct_ao_ano":0.7575555555555555,"loc_base":3750,"pct_marg_loc":0.2,"loc_tabela":4500,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":"https://yatil.com.br/imovel/terreno-a-venda-em-jaragua-do-sul-10845-m2-para-chacara-sitio-ou-empreendimento-comercial/TE0003","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"301 Studio Garden","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":62.43,"area_tot":82.43,"data_aquis":"2024-10-09","valor_inicial":334000,"valor_pretend":501000,"valor_atual":375000,"pct_marg_tabela":0.33,"valor_tabela":498750,"desc_max":123750,"rpsm2_total":4549.314569938129,"rpsm2_int":6006.727534839019,"valorizacao_pct":0.12275449101796407,"tempo_anos":1.7084188911704312,"pct_ao_ano":0.0718526888530631,"loc_base":1875,"pct_marg_loc":0.2,"loc_tabela":2250,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Garden: 36,74m² int + 25,69m² ext","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"302 Studio","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":39.44,"area_tot":59.44,"data_aquis":"2024-10-09","valor_inicial":297000,"valor_pretend":445500,"valor_atual":275000,"pct_marg_tabela":0.33,"valor_tabela":365750,"desc_max":90750,"rpsm2_total":4626.514131897712,"rpsm2_int":6972.616632860041,"valorizacao_pct":-0.07407407407407407,"tempo_anos":1.7084188911704312,"pct_ao_ano":-0.0433582621082621,"loc_base":1375,"pct_marg_loc":0.2,"loc_tabela":1650,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"303 Studio Garden","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":75.86,"area_tot":95.86,"data_aquis":"2024-10-09","valor_inicial":391000,"valor_pretend":586500,"valor_atual":391000,"pct_marg_tabela":0.33,"valor_tabela":520030,"desc_max":129030,"rpsm2_total":4078.865011475068,"rpsm2_int":5154.231479040338,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1955,"pct_marg_loc":0.2,"loc_tabela":2346,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Garden: 41,78m² int + 34,08m² ext","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"304 Studio Garden","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":84.59,"area_tot":104.58,"data_aquis":"2024-10-09","valor_inicial":411000,"valor_pretend":616500,"valor_atual":411000,"pct_marg_tabela":0.33,"valor_tabela":546630,"desc_max":135630,"rpsm2_total":3930.0057372346528,"rpsm2_int":4858.73034637664,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":2055,"pct_marg_loc":0.2,"loc_tabela":2466,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Garden: 41,78m² int + 42,80m² ext","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"305 Studio Garden","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":46.37,"area_tot":66.37,"data_aquis":"2024-10-09","valor_inicial":291000,"valor_pretend":436500,"valor_atual":291000,"pct_marg_tabela":0.33,"valor_tabela":387030,"desc_max":96030,"rpsm2_total":4384.511074280548,"rpsm2_int":6275.609230105672,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1455,"pct_marg_loc":0.2,"loc_tabela":1746,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Garden: 35,46m² int + 10,91m² ext","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"401 Studio","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":36.74,"area_tot":56.74,"data_aquis":"2024-10-09","valor_inicial":276000,"valor_pretend":414000,"valor_atual":276000,"pct_marg_tabela":0.33,"valor_tabela":367080,"desc_max":91080,"rpsm2_total":4864.29326753613,"rpsm2_int":7512.248230811105,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1380,"pct_marg_loc":0.2,"loc_tabela":1656,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":"https://yatil.com.br/imovel/lamanuinspiracao","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"402 Studio","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":39.44,"area_tot":59.44,"data_aquis":"2024-10-09","valor_inicial":297000,"valor_pretend":445500,"valor_atual":297000,"pct_marg_tabela":0.33,"valor_tabela":395010,"desc_max":98010,"rpsm2_total":4996.635262449529,"rpsm2_int":7530.425963488844,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1485,"pct_marg_loc":0.2,"loc_tabela":1782,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"403 Studio","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":41.78,"area_tot":61.78,"data_aquis":"2024-10-09","valor_inicial":314000,"valor_pretend":471000,"valor_atual":314000,"pct_marg_tabela":0.33,"valor_tabela":417620,"desc_max":103620,"rpsm2_total":5082.550987374555,"rpsm2_int":7515.5576831019625,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1570,"pct_marg_loc":0.2,"loc_tabela":1884,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"404 Studio","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":41.78,"area_tot":61.78,"data_aquis":"2024-10-09","valor_inicial":314000,"valor_pretend":471000,"valor_atual":314000,"pct_marg_tabela":0.33,"valor_tabela":417620,"desc_max":103620,"rpsm2_total":5082.550987374555,"rpsm2_int":7515.5576831019625,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1570,"pct_marg_loc":0.2,"loc_tabela":1884,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"405 Studio","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":35.46,"area_tot":55.46,"data_aquis":"2024-10-09","valor_inicial":267000,"valor_pretend":400500,"valor_atual":267000,"pct_marg_tabela":0.33,"valor_tabela":355110,"desc_max":88110,"rpsm2_total":4814.2805625676165,"rpsm2_int":7529.610829103215,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1335,"pct_marg_loc":0.2,"loc_tabela":1602,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"406 Studio","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":36.46,"area_tot":56.46,"data_aquis":"2024-10-09","valor_inicial":274000,"valor_pretend":411000,"valor_atual":274000,"pct_marg_tabela":0.33,"valor_tabela":364420,"desc_max":90420,"rpsm2_total":4852.993269571378,"rpsm2_int":7515.085024684586,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1370,"pct_marg_loc":0.2,"loc_tabela":1644,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":501,"disposicao":"1s+1q","vagas":1,"matricula":null,"area_int":70.83,"area_tot":90.83,"data_aquis":"2024-10-09","valor_inicial":533000,"valor_pretend":799500,"valor_atual":533000,"pct_marg_tabela":0.33,"valor_tabela":708890,"desc_max":175890,"rpsm2_total":5868.105251568865,"rpsm2_int":7525.060002823662,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":2665,"pct_marg_loc":0.2,"loc_tabela":3198,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":502,"disposicao":"1s+1q","vagas":1,"matricula":null,"area_int":72.83,"area_tot":92.83,"data_aquis":"2024-10-09","valor_inicial":548000,"valor_pretend":822000,"valor_atual":548000,"pct_marg_tabela":0.33,"valor_tabela":728840,"desc_max":180840,"rpsm2_total":5903.264031024453,"rpsm2_int":7524.371824797474,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":2740,"pct_marg_loc":0.2,"loc_tabela":3288,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":503,"disposicao":"1s+1q","vagas":1,"matricula":null,"area_int":71.57,"area_tot":91.57,"data_aquis":"2024-10-09","valor_inicial":538000,"valor_pretend":807000,"valor_atual":538000,"pct_marg_tabela":0.33,"valor_tabela":715540,"desc_max":177540,"rpsm2_total":5875.286665938626,"rpsm2_int":7517.116110101999,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":2690,"pct_marg_loc":0.2,"loc_tabela":3228,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":504,"disposicao":"1s+1q","vagas":1,"matricula":null,"area_int":68.43,"area_tot":88.43,"data_aquis":"2024-10-09","valor_inicial":515000,"valor_pretend":772500,"valor_atual":515000,"pct_marg_tabela":0.33,"valor_tabela":684950,"desc_max":169950,"rpsm2_total":5823.815447246409,"rpsm2_int":7525.938915680256,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":2575,"pct_marg_loc":0.2,"loc_tabela":3090,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":601,"disposicao":"1s+1q","vagas":1,"matricula":null,"area_int":70.83,"area_tot":90.83,"data_aquis":"2024-10-09","valor_inicial":533000,"valor_pretend":799500,"valor_atual":533000,"pct_marg_tabela":0.33,"valor_tabela":708890,"desc_max":175890,"rpsm2_total":5868.105251568865,"rpsm2_int":7525.060002823662,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":2665,"pct_marg_loc":0.2,"loc_tabela":3198,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":602,"disposicao":"1s+1q","vagas":1,"matricula":null,"area_int":72.83,"area_tot":92.83,"data_aquis":"2024-10-09","valor_inicial":548000,"valor_pretend":822000,"valor_atual":548000,"pct_marg_tabela":0.33,"valor_tabela":728840,"desc_max":180840,"rpsm2_total":5903.264031024453,"rpsm2_int":7524.371824797474,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":2740,"pct_marg_loc":0.2,"loc_tabela":3288,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":603,"disposicao":"1s+1q","vagas":1,"matricula":null,"area_int":71.57,"area_tot":91.57,"data_aquis":"2024-10-09","valor_inicial":538000,"valor_pretend":807000,"valor_atual":538000,"pct_marg_tabela":0.33,"valor_tabela":715540,"desc_max":177540,"rpsm2_total":5875.286665938626,"rpsm2_int":7517.116110101999,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":2690,"pct_marg_loc":0.2,"loc_tabela":3228,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":604,"disposicao":"1s+1q","vagas":1,"matricula":null,"area_int":68.43,"area_tot":88.43,"data_aquis":"2024-10-09","valor_inicial":515000,"valor_pretend":772500,"valor_atual":515000,"pct_marg_tabela":0.33,"valor_tabela":684950,"desc_max":169950,"rpsm2_total":5823.815447246409,"rpsm2_int":7525.938915680256,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":2575,"pct_marg_loc":0.2,"loc_tabela":3090,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":null,"link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"701 Studio Sup.","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":36.74,"area_tot":56.74,"data_aquis":"2024-10-09","valor_inicial":276000,"valor_pretend":414000,"valor_atual":276000,"pct_marg_tabela":0.33,"valor_tabela":367080,"desc_max":91080,"rpsm2_total":4864.29326753613,"rpsm2_int":7512.248230811105,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1380,"pct_marg_loc":0.2,"loc_tabela":1656,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Pav. superior","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"702 Cobertura","disposicao":"2 suítes","vagas":1,"matricula":null,"area_int":105,"area_tot":125,"data_aquis":"2024-10-09","valor_inicial":790000,"valor_pretend":1185000,"valor_atual":790000,"pct_marg_tabela":0.33,"valor_tabela":1050700,"desc_max":260700,"rpsm2_total":6320,"rpsm2_int":7523.809523809524,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":3950,"pct_marg_loc":0.2,"loc_tabela":4740,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Duplex 7°/8° pav.","link_venda":"https://yatil.com.br/imovel/lamanucobertura","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"703 Cobertura","disposicao":"2 suítes","vagas":1,"matricula":null,"area_int":110,"area_tot":130,"data_aquis":"2024-10-09","valor_inicial":828000,"valor_pretend":1242000,"valor_atual":828000,"pct_marg_tabela":0.33,"valor_tabela":1101240,"desc_max":273240,"rpsm2_total":6369.2307692307695,"rpsm2_int":7527.272727272727,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":4140,"pct_marg_loc":0.2,"loc_tabela":4968,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Duplex 7°/8° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"704 Cobertura","disposicao":"2 suítes","vagas":1,"matricula":null,"area_int":110,"area_tot":130,"data_aquis":"2024-10-09","valor_inicial":828000,"valor_pretend":1242000,"valor_atual":828000,"pct_marg_tabela":0.33,"valor_tabela":1101240,"desc_max":273240,"rpsm2_total":6369.2307692307695,"rpsm2_int":7527.272727272727,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":4140,"pct_marg_loc":0.2,"loc_tabela":4968,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Duplex 7°/8° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"705 Cobertura","disposicao":"2 suítes","vagas":1,"matricula":null,"area_int":103,"area_tot":123,"data_aquis":"2024-10-09","valor_inicial":775000,"valor_pretend":1162500,"valor_atual":775000,"pct_marg_tabela":0.33,"valor_tabela":1030750,"desc_max":255750,"rpsm2_total":6300.8130081300815,"rpsm2_int":7524.271844660194,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":3875,"pct_marg_loc":0.2,"loc_tabela":4650,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Duplex 7°/8° pav.","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  LaManu EMPREENDIMENTOS — Pré-Lançamento  |  Início Obra: Out/2026","status":"À VENDA","imovel":"LaManu","unidade":"706 Studio Sup.","disposicao":"1 suíte","vagas":1,"matricula":null,"area_int":36.46,"area_tot":56.46,"data_aquis":"2024-10-09","valor_inicial":274000,"valor_pretend":411000,"valor_atual":274000,"pct_marg_tabela":0.33,"valor_tabela":364420,"desc_max":90420,"rpsm2_total":4852.993269571378,"rpsm2_int":7515.085024684586,"valorizacao_pct":0,"tempo_anos":1.7084188911704312,"pct_ao_ano":0,"loc_base":1370,"pct_marg_loc":0.2,"loc_tabela":1644,"custo_mensal":null,"rent_atual":null,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"Pav. superior","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  FUN YATIL — Condomínio Serena Essênce  |  Rua São Paulo, JGS","status":"À VENDA","imovel":"SERENA ESSÊNCE","unidade":"CASA 02","disposicao":"3 Suítes","vagas":2,"matricula":"RI52.488","area_int":130,"area_tot":211.9,"data_aquis":"2024-08-01","valor_inicial":850000,"valor_pretend":1275000,"valor_atual":870000,"pct_marg_tabela":0.1,"valor_tabela":957000.0000000001,"desc_max":87000.00000000012,"rpsm2_total":4105.710240679566,"rpsm2_int":6692.307692307692,"valorizacao_pct":0.023529411764705882,"tempo_anos":1.8973305954825461,"pct_ao_ano":0.012401324166030049,"loc_base":4350,"pct_marg_loc":0.2,"loc_tabela":5220,"custo_mensal":null,"rent_atual":4350,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"F:6,50m × L:23m | Em obra","link_venda":"https://yatil.com.br/imovel/serena-essence-czerniewicz-jaraguadosul","link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  FUN YATIL — Condomínio Serena Essênce  |  Rua São Paulo, JGS","status":"À VENDA","imovel":"SERENA ESSÊNCE","unidade":"CASA 03","disposicao":"3 Suítes","vagas":2,"matricula":"RI52.488","area_int":130,"area_tot":211.9,"data_aquis":"2024-08-01","valor_inicial":850000,"valor_pretend":1275000,"valor_atual":870000,"pct_marg_tabela":0.1,"valor_tabela":957000.0000000001,"desc_max":87000.00000000012,"rpsm2_total":4105.710240679566,"rpsm2_int":6692.307692307692,"valorizacao_pct":0.023529411764705882,"tempo_anos":1.8973305954825461,"pct_ao_ano":0.012401324166030049,"loc_base":4350,"pct_marg_loc":0.2,"loc_tabela":5220,"custo_mensal":null,"rent_atual":4350,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"F:6,50m × L:23m | Em obra","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  FUN YATIL — Condomínio Serena Essênce  |  Rua São Paulo, JGS","status":"À VENDA","imovel":"SERENA ESSÊNCE","unidade":"CASA 04","disposicao":"3 Suítes","vagas":2,"matricula":"RI52.488","area_int":130,"area_tot":211.9,"data_aquis":"2024-08-01","valor_inicial":850000,"valor_pretend":1275000,"valor_atual":870000,"pct_marg_tabela":0.1,"valor_tabela":957000.0000000001,"desc_max":87000.00000000012,"rpsm2_total":4105.710240679566,"rpsm2_int":6692.307692307692,"valorizacao_pct":0.023529411764705882,"tempo_anos":1.8973305954825461,"pct_ao_ano":0.012401324166030049,"loc_base":4350,"pct_marg_loc":0.2,"loc_tabela":5220,"custo_mensal":null,"rent_atual":4350,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"F:6,50m × L:23m | Em obra","link_venda":null,"link_locacao":null,"data_venda":null,"valor_vendido":null},{"secao":"▶  FUN YATIL — Condomínio Serena Essênce  |  Rua São Paulo, JGS","status":"À VENDA","imovel":"SERENA ESSÊNCE","unidade":"CASA 05","disposicao":"3 Suítes","vagas":2,"matricula":"RI52.488","area_int":235,"area_tot":295,"data_aquis":"2024-08-01","valor_inicial":1100000,"valor_pretend":1650000,"valor_atual":1200000,"pct_marg_tabela":0.1,"valor_tabela":1320000,"desc_max":120000,"rpsm2_total":4067.7966101694915,"rpsm2_int":5106.382978723404,"valorizacao_pct":0.09090909090909091,"tempo_anos":1.8973305954825461,"pct_ao_ano":0.0479142070051161,"loc_base":6000,"pct_marg_loc":0.2,"loc_tabela":7200,"custo_mensal":null,"rent_atual":6000,"iptu_anual":null,"valor_venal_iptu":null,"observacoes":"F:10,00m × L:23m | Em obra","link_venda":"https://yatil.com.br/imovel/casa-a-venda-czerniewicz-jaragua-do-sul-sc","link_locacao":null,"data_venda":null,"valor_vendido":null}],"comercial":[{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"301","disposicao":"4 Suítes","vagas":3,"area_int":233.31,"area_tot":393.68,"rpsm2_total":6023.928063401748,"valor_tabela":2964375,"loc_tabela":null,"observacoes":"Suspensa 3° pav."},{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"302 GARDEN","disposicao":"4 Suítes","vagas":3,"area_int":391.26,"area_tot":551.63,"rpsm2_total":6322.1724706778095,"valor_tabela":4359375,"loc_tabela":null,"observacoes":"Garden 2° pav."},{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"401","disposicao":"4 Suítes","vagas":3,"area_int":233.31,"area_tot":393.68,"rpsm2_total":6165.667547246495,"valor_tabela":3034125,"loc_tabela":null,"observacoes":"Suspensa 4° pav."},{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"402","disposicao":"4 Suítes","vagas":3,"area_int":243.75,"area_tot":404.12,"rpsm2_total":6178.9814906463425,"valor_tabela":3121312.5,"loc_tabela":null,"observacoes":"Suspensa 4° pav."},{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"501","disposicao":"4 Suítes","vagas":3,"area_int":233.31,"area_tot":393.68,"rpsm2_total":6307.407031091241,"valor_tabela":3103875,"loc_tabela":null,"observacoes":"Suspensa 5° pav."},{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"502","disposicao":"4 Suítes","vagas":3,"area_int":243.75,"area_tot":404.12,"rpsm2_total":6317.059289320004,"valor_tabela":3191062.5,"loc_tabela":null,"observacoes":"Suspensa 5° pav."},{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"601","disposicao":"4 Suítes","vagas":3,"area_int":233.31,"area_tot":393.68,"rpsm2_total":6449.146514935988,"valor_tabela":3173625,"loc_tabela":null,"observacoes":"Suspensa 6° pav."},{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"602","disposicao":"4 Suítes","vagas":3,"area_int":243.75,"area_tot":404.12,"rpsm2_total":6455.137087993665,"valor_tabela":3260812.5,"loc_tabela":null,"observacoes":"Suspensa 6° pav."},{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"701","disposicao":"4 Suítes","vagas":3,"area_int":233.31,"area_tot":393.68,"rpsm2_total":6590.8859987807355,"valor_tabela":3243375,"loc_tabela":null,"observacoes":"Suspensa 7° pav."},{"secao":"▶  New Village Concept","status":"À VENDA","imovel":"NVC","unidade":"1001 PENTHOUSE","disposicao":"4 Suítes","vagas":3,"area_int":474.47,"area_tot":634.84,"rpsm2_total":8785.221473127087,"valor_tabela":6971512.5,"loc_tabela":null,"observacoes":"Penthouse duplex 10°/11°"},{"secao":"▶  JF Pradi Residence","status":"À VENDA","imovel":"JF PRADI","unidade":"502","disposicao":"3 Suítes","vagas":2,"area_int":136.25,"area_tot":201.81,"rpsm2_total":5515.088449531738,"valor_tabela":1279950,"loc_tabela":null,"observacoes":"6° pav. | Disponível para visitas"},{"secao":"▶  JF Pradi Residence","status":"À VENDA","imovel":"JF PRADI","unidade":"504","disposicao":"3 Suítes","vagas":2,"area_int":136.25,"area_tot":201.81,"rpsm2_total":6193.944799563947,"valor_tabela":1437500,"loc_tabela":null,"observacoes":"Semimobiliado | proprietário morando visitas pontuais"},{"secao":"▶  JF Pradi Residence","status":"DISPONÍVEL","imovel":"JF PRADI","unidade":"VAGA","disposicao":"Vaga","vagas":0,"area_int":0,"area_tot":0,"rpsm2_total":null,"valor_tabela":143750,"loc_tabela":385.00000000000006,"observacoes":null},{"secao":"▶  JF Pradi Residence","status":"DISPONÍVEL","imovel":"JF PRADI","unidade":"BOX","disposicao":"Box","vagas":0,"area_int":0,"area_tot":0,"rpsm2_total":null,"valor_tabela":28749.999999999996,"loc_tabela":110.00000000000001,"observacoes":null},{"secao":"▶  Serena Essence — EM FASE FINAL DE CONSTRUÇÃO — RI 52.488","status":"À VENDA","imovel":"SERENA ESSÊNCE","unidade":"CASA 02","disposicao":"3 Suítes","vagas":2,"area_int":130,"area_tot":211.9,"rpsm2_total":5220,"valor_tabela":957000.0000000001,"loc_tabela":null,"observacoes":"F:6,50m × L:23m"},{"secao":"▶  Serena Essence — EM FASE FINAL DE CONSTRUÇÃO — RI 52.488","status":"À VENDA","imovel":"SERENA ESSÊNCE","unidade":"CASA 03","disposicao":"3 Suítes","vagas":2,"area_int":130,"area_tot":211.9,"rpsm2_total":5220,"valor_tabela":957000.0000000001,"loc_tabela":null,"observacoes":"F:6,50m × L:23m"},{"secao":"▶  Serena Essence — EM FASE FINAL DE CONSTRUÇÃO — RI 52.488","status":"À VENDA","imovel":"SERENA ESSÊNCE","unidade":"CASA 04","disposicao":"3 Suítes","vagas":2,"area_int":130,"area_tot":211.9,"rpsm2_total":5220,"valor_tabela":957000.0000000001,"loc_tabela":null,"observacoes":"F:6,50m × L:23m"},{"secao":"▶  Serena Essence — EM FASE FINAL DE CONSTRUÇÃO — RI 52.488","status":"À VENDA","imovel":"SERENA ESSÊNCE","unidade":"CASA 05","disposicao":"3 Suítes","vagas":2,"area_int":235,"area_tot":295,"rpsm2_total":7200,"valor_tabela":1320000,"loc_tabela":null,"observacoes":"F:10,00m × L:23m"},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"301 Studio Garden","disposicao":"1 suíte","vagas":1,"area_int":62.43,"area_tot":82.43,"rpsm2_total":4549.314569938129,"valor_tabela":498750,"loc_tabela":2250,"observacoes":"Garden: 36,74m² int + 25,69m² ext"},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"302 Studio","disposicao":"1 suíte","vagas":1,"area_int":39.44,"area_tot":59.44,"rpsm2_total":4626.514131897712,"valor_tabela":365750,"loc_tabela":1650,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"303 Studio Garden","disposicao":"1 suíte","vagas":1,"area_int":75.86,"area_tot":95.86,"rpsm2_total":4078.865011475068,"valor_tabela":520030,"loc_tabela":2346,"observacoes":"Garden: 41,78m² int + 34,08m² ext"},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"304 Studio Garden","disposicao":"1 suíte","vagas":1,"area_int":84.59,"area_tot":104.58,"rpsm2_total":3930.0057372346528,"valor_tabela":546630,"loc_tabela":2466,"observacoes":"Garden: 41,78m² int + 42,80m² ext"},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"305 Studio Garden","disposicao":"1 suíte","vagas":1,"area_int":46.37,"area_tot":66.37,"rpsm2_total":4384.511074280548,"valor_tabela":387030,"loc_tabela":1746,"observacoes":"Garden: 35,46m² int + 10,91m² ext"},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"401 Studio","disposicao":"1 suíte","vagas":1,"area_int":36.74,"area_tot":56.74,"rpsm2_total":4864.29326753613,"valor_tabela":367080,"loc_tabela":1656,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"402 Studio","disposicao":"1 suíte","vagas":1,"area_int":39.44,"area_tot":59.44,"rpsm2_total":4996.635262449529,"valor_tabela":395010,"loc_tabela":1782,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"403 Studio","disposicao":"1 suíte","vagas":1,"area_int":41.78,"area_tot":61.78,"rpsm2_total":5082.550987374555,"valor_tabela":417620,"loc_tabela":1884,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"404 Studio","disposicao":"1 suíte","vagas":1,"area_int":41.78,"area_tot":61.78,"rpsm2_total":5082.550987374555,"valor_tabela":417620,"loc_tabela":1884,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"405 Studio","disposicao":"1 suíte","vagas":1,"area_int":35.46,"area_tot":55.46,"rpsm2_total":4814.2805625676165,"valor_tabela":355110,"loc_tabela":1602,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"406 Studio","disposicao":"1 suíte","vagas":1,"area_int":36.46,"area_tot":56.46,"rpsm2_total":4852.993269571378,"valor_tabela":364420,"loc_tabela":1644,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":501,"disposicao":"1s+1q","vagas":1,"area_int":70.83,"area_tot":90.83,"rpsm2_total":5868.105251568865,"valor_tabela":708890,"loc_tabela":3198,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":502,"disposicao":"1s+1q","vagas":1,"area_int":72.83,"area_tot":92.83,"rpsm2_total":5903.264031024453,"valor_tabela":728840,"loc_tabela":3288,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":503,"disposicao":"1s+1q","vagas":1,"area_int":71.57,"area_tot":91.57,"rpsm2_total":5875.286665938626,"valor_tabela":715540,"loc_tabela":3228,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":504,"disposicao":"1s+1q","vagas":1,"area_int":68.43,"area_tot":88.43,"rpsm2_total":5823.815447246409,"valor_tabela":684950,"loc_tabela":3090,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":601,"disposicao":"1s+1q","vagas":1,"area_int":70.83,"area_tot":90.83,"rpsm2_total":5868.105251568865,"valor_tabela":708890,"loc_tabela":3198,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":602,"disposicao":"1s+1q","vagas":1,"area_int":72.83,"area_tot":92.83,"rpsm2_total":5903.264031024453,"valor_tabela":728840,"loc_tabela":3288,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":603,"disposicao":"1s+1q","vagas":1,"area_int":71.57,"area_tot":91.57,"rpsm2_total":5875.286665938626,"valor_tabela":715540,"loc_tabela":3228,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":604,"disposicao":"1s+1q","vagas":1,"area_int":68.43,"area_tot":88.43,"rpsm2_total":5823.815447246409,"valor_tabela":684950,"loc_tabela":3090,"observacoes":0},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"701 Studio Sup.","disposicao":"1 suíte","vagas":1,"area_int":36.74,"area_tot":56.74,"rpsm2_total":4864.29326753613,"valor_tabela":367080,"loc_tabela":1656,"observacoes":"Pav. superior"},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"702 Cobertura","disposicao":"2 suítes","vagas":1,"area_int":105,"area_tot":125,"rpsm2_total":6320,"valor_tabela":1050700,"loc_tabela":4740,"observacoes":"Duplex 7°/8° pav."},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"703 Cobertura","disposicao":"2 suítes","vagas":1,"area_int":110,"area_tot":130,"rpsm2_total":6369.2307692307695,"valor_tabela":1101240,"loc_tabela":4968,"observacoes":"Duplex 7°/8° pav."},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"704 Cobertura","disposicao":"2 suítes","vagas":1,"area_int":110,"area_tot":130,"rpsm2_total":6369.2307692307695,"valor_tabela":1101240,"loc_tabela":4968,"observacoes":"Duplex 7°/8° pav."},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"705 Cobertura","disposicao":"2 suítes","vagas":1,"area_int":103,"area_tot":123,"rpsm2_total":6300.8130081300815,"valor_tabela":1030750,"loc_tabela":4650,"observacoes":"Duplex 7°/8° pav."},{"secao":"▶  LaManu — Pré-Lançamento","status":"EXCLUSIVO","imovel":"LaManu","unidade":"706 Studio Sup.","disposicao":"1 suíte","vagas":1,"area_int":36.46,"area_tot":56.46,"rpsm2_total":4852.993269571378,"valor_tabela":364420,"loc_tabela":1644,"observacoes":"Pav. superior"},{"secao":"▶  APARTAMENTOS","status":"DISPONÍVEL","imovel":"SAINT SEBASTIAN","unidade":"611","disposicao":"1 Suíte","vagas":1,"area_int":60.03,"area_tot":105.65,"rpsm2_total":5205.868433506862,"valor_tabela":660000,"loc_tabela":3849.9999999999995,"observacoes":"Disponível: VENDA e LOCAÇÃO"},{"secao":"▶  APARTAMENTOS","status":"DISPONÍVEL","imovel":"PEGASUS","unidade":"BOX 03","disposicao":"Box","vagas":0,"area_int":2.45,"area_tot":9.82,"rpsm2_total":509.1649694501018,"valor_tabela":6000,"loc_tabela":0,"observacoes":0},{"secao":"▶  APARTAMENTOS","status":"DISPONÍVEL","imovel":"PEGASUS","unidade":"VAGA 33","disposicao":"Vaga","vagas":0,"area_int":12.25,"area_tot":17.38,"rpsm2_total":1726.1219792865363,"valor_tabela":36000,"loc_tabela":180,"observacoes":0},{"secao":"▶  APARTAMENTOS","status":"DISPONÍVEL","imovel":"PEGASUS","unidade":"VAGA 34","disposicao":"Vaga","vagas":0,"area_int":12,"area_tot":17.13,"rpsm2_total":1751.3134851138354,"valor_tabela":36000,"loc_tabela":180,"observacoes":0},{"secao":"▶  APARTAMENTOS","status":"EXCLUSIVO","imovel":"EMENDOERFER H. CLUB","unidade":"204","disposicao":"1s+2q","vagas":2,"area_int":84,"area_tot":127,"rpsm2_total":5433.070866141732,"valor_tabela":828000,"loc_tabela":null,"observacoes":"Mobiliado 3° pav. proprietário morando visitas pontuais"},{"secao":"▶  CASAS","status":"DISPONÍVEL","imovel":"CASA ELEONORA","unidade":"198","disposicao":"4 Suítes","vagas":4,"area_int":311,"area_tot":343.6,"rpsm2_total":6897.55529685681,"valor_tabela":2725500,"loc_tabela":14220,"observacoes":"Piscina+Spa | Mobiliada"},{"secao":"▶  CASAS","status":"EXCLUSIVO","imovel":"CASA AZALEIA","unidade":"—","disposicao":"4 Suítes","vagas":5,"area_int":440.78,"area_tot":974.37,"rpsm2_total":4925.367160318975,"valor_tabela":5518999.5,"loc_tabela":null,"observacoes":"Somente venda."},{"secao":"▶  CASAS","status":"DISPONÍVEL","imovel":"CASA ALEXANDRIA","unidade":"11","disposicao":"3 Suítes","vagas":4,"area_int":210.22,"area_tot":416.7,"rpsm2_total":3599.712023038157,"valor_tabela":1724999.9999999998,"loc_tabela":9000,"observacoes":"Piscina+Ofurô"},{"secao":"▶  TERRENOS","status":"À VENDA","imovel":"HORIZONTES","unidade":"Lote 02","disposicao":"Terreno","vagas":0,"area_int":1851.07,"area_tot":2294.52,"rpsm2_total":500.10459703990375,"valor_tabela":1377000,"loc_tabela":null,"observacoes":"Cond. fechado | Baependi"},{"secao":"▶  TERRENOS","status":"DISPONÍVEL","imovel":"PIÇARRAS","unidade":"—","disposicao":"Terreno","vagas":0,"area_int":444.75,"area_tot":630,"rpsm2_total":4629.630158730159,"valor_tabela":3500000.4,"loc_tabela":17500.002,"observacoes":"Beira-mar | Vista permanente"},{"secao":"▶  TERRENOS","status":"EXCLUSIVO","imovel":"VIEIRAS ADOLFO TRIBESS","unidade":"—","disposicao":"Terreno","vagas":0,"area_int":1548,"area_tot":1548,"rpsm2_total":1001.2919896640827,"valor_tabela":1860000,"loc_tabela":9300,"observacoes":0},{"secao":"▶  TERRENOS","status":"DISPONÍVEL","imovel":"NOVICIADO","unidade":"—","disposicao":"Terreno","vagas":0,"area_int":4300,"area_tot":10845.75,"rpsm2_total":69.15151096051449,"valor_tabela":900000,"loc_tabela":4500,"observacoes":0},{"secao":"▶  LOCAÇÃO COMERCIAL","status":"EXCLUSIVO","imovel":"S. PRADI","unidade":"SALA 01","disposicao":"Sala Comercial","vagas":0,"area_int":86,"area_tot":0,"rpsm2_total":0,"valor_tabela":539000,"loc_tabela":3430,"observacoes":"Frente rua, semi mobiliada"},{"secao":"▶  LOCAÇÃO COMERCIAL","status":"EXCLUSIVO","imovel":"S. PRADI","unidade":"SALA 02","disposicao":"Sala Comercial","vagas":0,"area_int":92,"area_tot":0,"rpsm2_total":0,"valor_tabela":580030,"loc_tabela":3163.7999999999997,"observacoes":"Frente rua"},{"secao":"▶  LOCAÇÃO COMERCIAL","status":"EXCLUSIVO","imovel":"S. PRADI","unidade":"SALA 01 e 02","disposicao":"Sala Comercial","vagas":0,"area_int":177,"area_tot":0,"rpsm2_total":0,"valor_tabela":null,"loc_tabela":6399,"observacoes":"Frente rua, semi mobiliada"},{"secao":"▶  LOCAÇÃO COMERCIAL","status":"EXCLUSIVO","imovel":"S. PRADI","unidade":"SALA 04","disposicao":"Sala Comercial","vagas":0,"area_int":67,"area_tot":0,"rpsm2_total":0,"valor_tabela":451000.00000000006,"loc_tabela":2460,"observacoes":"Frente rua"},{"secao":"▶  LOCAÇÃO RESIDENCIAL","status":"EXCLUSIVO","imovel":"S. PRADI","unidade":204,"disposicao":"1s+2q","vagas":1,"area_int":100,"area_tot":0,"rpsm2_total":0,"valor_tabela":690000,"loc_tabela":3300.0000000000005,"observacoes":"Semimobiliado: cozinha, lavanderia, 2 banheiros (granito/MDF)"}],"cartas":[{"imovel_ref":"","garantia":"GARANTIA","adm":"ADM.","grupo":"GRUPO","cota":"COTA","inicio":"INICIO","lance_embutido":"LANCE\nEMBUTIDO","lance_dinheiro":"LANCE\nDINHEIRO","credito_atualizado":"CREDITO ATUALIZADO","prazo_a_pagar":"PRAZO\nA PAGAR","valor_parcela":"VALOR PARCELA","saldo_devedor":"SALDO DEVEDOR","tx":"TX","credito_tyago":"CREDITO"},{"imovel_ref":"SALA CONSTRUTORA","garantia":"SALA CONSTRUTORA","adm":"CANOPUS","grupo":"9961","cota":"529","inicio":"2021-11-05","lance_embutido":39623.54,"lance_dinheiro":null,"credito_atualizado":97827.11,"prazo_a_pagar":95,"valor_parcela":923.08,"saldo_devedor":87692.82,"tx":0.01,"credito_tyago":56439.86199754847},{"imovel_ref":"SALA CONSTRUTORA","garantia":"SALA CONSTRUTORA","adm":"CANOPUS","grupo":"9961","cota":"301","inicio":"2021-11-05","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":138747.77,"prazo_a_pagar":95,"valor_parcela":1335.08,"saldo_devedor":120173.03,"tx":0.01,"credito_tyago":81630.76976609502},{"imovel_ref":"SALA CONSTRUTORA","garantia":"SALA CONSTRUTORA","adm":"CANOPUS","grupo":"9961","cota":"193","inicio":"2021-11-05","lance_embutido":39623.54,"lance_dinheiro":null,"credito_atualizado":99012.27,"prazo_a_pagar":95,"valor_parcela":923.23,"saldo_devedor":87687.45,"tx":0.01,"credito_tyago":56449.03344455157},{"imovel_ref":"SALA CONSTRUTORA","garantia":"SALA CONSTRUTORA","adm":"CANOPUS","grupo":"9961","cota":"201","inicio":"2021-11-05","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":125142.42,"prazo_a_pagar":95,"valor_parcela":1181.94,"saldo_devedor":112283.72,"tx":0.01,"credito_tyago":72267.33380571828},{"imovel_ref":"JF PRADI 501","garantia":"JF PRADI 501","adm":"CANOPUS","grupo":"9900","cota":"31","inicio":"2022-02-11","lance_embutido":null,"lance_dinheiro":104479.92,"credito_atualizado":252925.36,"prazo_a_pagar":48,"valor_parcela":2474.01,"saldo_devedor":116644.67,"tx":0.012,"credito_tyago":89873.95631580369},{"imovel_ref":"JF PRADI 501","garantia":"JF PRADI 501","adm":"CANOPUS","grupo":"9961","cota":"458","inicio":"2021-11-05","lance_embutido":null,"lance_dinheiro":53159.88,"credito_atualizado":126211.8,"prazo_a_pagar":44,"valor_parcela":1320.62,"saldo_devedor":54594.96,"tx":0.012,"credito_tyago":44940.710378122436},{"imovel_ref":"JF PRADI 501","garantia":"JF PRADI 501","adm":"CANOPUS","grupo":"9961","cota":"874","inicio":"2021-11-05","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":114200.7,"prazo_a_pagar":95,"valor_parcela":1150.5,"saldo_devedor":109302.29,"tx":0.012,"credito_tyago":65003.57411349396},{"imovel_ref":"JF PRADI 501","garantia":"JF PRADI 501","adm":"CANOPUS","grupo":"9961","cota":"469","inicio":"2021-11-05","lance_embutido":36000,"lance_dinheiro":null,"credito_atualizado":86315.88,"prazo_a_pagar":95,"valor_parcela":993.23,"saldo_devedor":87692.84,"tx":0.012,"credito_tyago":56117.77480812308},{"imovel_ref":"JF PRADI 503","garantia":"JF PRADI 503","adm":"CANOPUS","grupo":9900,"cota":770,"inicio":"2022-02-11","lance_embutido":72000,"lance_dinheiro":null,"credito_atualizado":175993.97,"prazo_a_pagar":44,"valor_parcela":1836.45,"saldo_devedor":79488.04,"tx":0.01,"credito_tyago":65112.16762505543},{"imovel_ref":"JF PRADI 503","garantia":"JF PRADI 503","adm":"CANOPUS","grupo":9961,"cota":233,"inicio":"2021-11-01","lance_embutido":null,"lance_dinheiro":53626.68,"credito_atualizado":127308.78,"prazo_a_pagar":44,"valor_parcela":1309.39,"saldo_devedor":52898.63,"tx":0.01,"credito_tyago":46425.01629043608},{"imovel_ref":"JF PRADI 503","garantia":"JF PRADI 503","adm":"DIEGO","grupo":9900,"cota":780,"inicio":"2022-02-10","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":206597,"prazo_a_pagar":99,"valor_parcela":2058.1,"saldo_devedor":203800.09,"tx":0.01,"credito_tyago":128958.83274444946},{"imovel_ref":"JF PRADI 503","garantia":"JF PRADI 503","adm":"DIEGO","grupo":9961,"cota":782,"inicio":"2021-11-24","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":103298.6,"prazo_a_pagar":97,"valor_parcela":1058.94,"saldo_devedor":100299.87,"tx":0.01,"credito_tyago":65557.51069813427},{"imovel_ref":"CASA ELEONORA","garantia":"CASA ELEONORA","adm":"ADEMILAR","grupo":570,"cota":1366,"inicio":"2019-05-07","lance_embutido":36610.93,"lance_dinheiro":null,"credito_atualizado":79153.15,"prazo_a_pagar":137,"valor_parcela":714.81,"saldo_devedor":97924.09,"tx":0.01,"credito_tyago":53193.16008908379},{"imovel_ref":"CASA ELEONORA","garantia":"CASA ELEONORA","adm":"ADEMILAR","grupo":570,"cota":1818,"inicio":"2019-05-07","lance_embutido":41673.24,"lance_dinheiro":null,"credito_atualizado":94399.13,"prazo_a_pagar":137,"valor_parcela":720.31,"saldo_devedor":98708.1,"tx":0.01,"credito_tyago":53602.44700517332},{"imovel_ref":"CASA ELEONORA","garantia":"CASA ELEONORA","adm":"ADEMILAR","grupo":570,"cota":1990,"inicio":"2019-05-07","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":135968.22,"prazo_a_pagar":137,"valor_parcela":1018.19,"saldo_devedor":139491.2,"tx":0.01,"credito_tyago":75769.42638058256},{"imovel_ref":"JF PRADI 502","garantia":"JF PRADI 502","adm":"SERVOPA","grupo":1535,"cota":494,"inicio":"2020-09-15","lance_embutido":null,"lance_dinheiro":42080.74,"credito_atualizado":90617.51,"prazo_a_pagar":168,"valor_parcela":362.08,"saldo_devedor":60854.99,"tx":0.01,"credito_tyago":29403.22544962058},{"imovel_ref":"JF PRADI 504","garantia":"JF PRADI 504","adm":"SERVOPA","grupo":"1535","cota":"242","inicio":"2020-09-15","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":134251.09,"prazo_a_pagar":166,"valor_parcela":799.49,"saldo_devedor":132701.76,"tx":0.01,"credito_tyago":64621.7236403308},{"imovel_ref":"CASA AZALEIA","garantia":"CASA AZALEIA","adm":"SERVOPA","grupo":"1546","cota":"525","inicio":"2024-03-28","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":226567,"prazo_a_pagar":179,"valor_parcela":1470.27,"saldo_devedor":263199.65,"tx":0.01,"credito_tyago":122260.1263423391},{"imovel_ref":"CASA AZALEIA","garantia":"CASA AZALEIA","adm":"SERVOPA","grupo":"1558","cota":"2546","inicio":"2024-03-28","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":1027560,"prazo_a_pagar":184,"valor_parcela":6147.84,"saldo_devedor":1131292.86,"tx":0.01,"credito_tyago":516249.16804077284},{"imovel_ref":"CASA AZALEIA","garantia":"CASA AZALEIA","adm":"SERVOPA","grupo":"1558","cota":"2547","inicio":"2023-11-07","lance_embutido":null,"lance_dinheiro":344286,"credito_atualizado":674150,"prazo_a_pagar":119,"valor_parcela":6147.84,"saldo_devedor":731683.43,"tx":0.01,"credito_tyago":426644.89393916057},{"imovel_ref":"AP SAINT SEBASTIAN","garantia":"AP SAINT SEBASTIAN","adm":"SERVOPA","grupo":"1544","cota":"0497-0","inicio":"2025-09-01","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":97581.88,"prazo_a_pagar":172,"valor_parcela":585.23,"saldo_devedor":103993.69,"tx":0.01,"credito_tyago":47953.60106989148},{"imovel_ref":"AP SAINT SEBASTIAN","garantia":"AP SAINT SEBASTIAN","adm":"SERVOPA","grupo":"1554","cota":"5656-3","inicio":"2025-09-01","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":89700.85,"prazo_a_pagar":100,"valor_parcela":888.76,"saldo_devedor":88875.48,"tx":0.01,"credito_tyago":56017.54629303722},{"imovel_ref":"AP SAINT SEBASTIAN","garantia":"AP SAINT SEBASTIAN","adm":"SERVOPA","grupo":"1556","cota":"2885-2","inicio":"2025-09-01","lance_embutido":"sorteio","lance_dinheiro":null,"credito_atualizado":277607.58,"prazo_a_pagar":94,"valor_parcela":2721.11,"saldo_devedor":263184.59,"tx":0.01,"credito_tyago":165319.4321078895},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1531","cota":"0339-3","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":72339.73,"prazo_a_pagar":null,"valor_parcela":null,"saldo_devedor":null,"tx":0.01,"credito_tyago":0},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1533","cota":"0014-1","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":228006.07,"prazo_a_pagar":104,"valor_parcela":2072.49,"saldo_devedor":215521.24,"tx":0.01,"credito_tyago":133616.49588924073},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1544","cota":"0502-0","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":74223.35,"prazo_a_pagar":123,"valor_parcela":688.05,"saldo_devedor":84628.23,"tx":0.01,"credito_tyago":48570.56771633038},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1549","cota":"0233-1","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":111738.75,"prazo_a_pagar":111,"valor_parcela":1089.24,"saldo_devedor":120893.74,"tx":0.01,"credito_tyago":72828.66377207576},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1550","cota":"0608-8","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":187731.12,"prazo_a_pagar":134,"valor_parcela":1606.97,"saldo_devedor":215343.44,"tx":0.01,"credito_tyago":118338.19668760234},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1552","cota":"0925-6","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":110006.71,"prazo_a_pagar":137,"valor_parcela":933.39,"saldo_devedor":127877.8,"tx":0.01,"credito_tyago":69458.96629251119},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1554","cota":"0602-7","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":72966.73,"prazo_a_pagar":138,"valor_parcela":629.96,"saldo_devedor":86934.33,"tx":0.01,"credito_tyago":47038.553674124894},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1554","cota":"1683-9","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":72553.39,"prazo_a_pagar":139,"valor_parcela":637.09,"saldo_devedor":88550.49,"tx":0.01,"credito_tyago":47730.72716961477},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1554","cota":"5353-0","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":25796.73,"prazo_a_pagar":137,"valor_parcela":622.14,"saldo_devedor":85229.18,"tx":0.01,"credito_tyago":46297.04763198974},{"imovel_ref":"CASA ALEXANDRIA","garantia":"CASA ALEXANDRIA","adm":"SERVOPA","grupo":"1555","cota":"1266-8","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":72205.74,"prazo_a_pagar":141,"valor_parcela":601.91,"saldo_devedor":84862.98,"tx":0.01,"credito_tyago":45392.49460005397},{"imovel_ref":"CASA ALEXANDRIA","garantia":"ASSUNÇÃO","adm":"SERVOPA","grupo":"1517","cota":"0490-5","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":null,"valor_parcela":null,"saldo_devedor":null,"tx":0.01,"credito_tyago":0},{"imovel_ref":"CASA ALEXANDRIA","garantia":"ASSUNÇÃO","adm":"SERVOPA","grupo":"1525","cota":"0444-5","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":null,"valor_parcela":null,"saldo_devedor":null,"tx":0.01,"credito_tyago":0},{"imovel_ref":"CASA ALEXANDRIA","garantia":"ASSUNÇÃO","adm":"SERVOPA","grupo":"1526","cota":"0387-8","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":null,"valor_parcela":null,"saldo_devedor":null,"tx":0.01,"credito_tyago":0},{"imovel_ref":"CASA ALEXANDRIA","garantia":"ASSUNÇÃO","adm":"SERVOPA","grupo":"1532","cota":"0135-5","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":null,"valor_parcela":null,"saldo_devedor":null,"tx":0.01,"credito_tyago":0},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1535,"cota":"489-0","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":406275.07,"prazo_a_pagar":172,"valor_parcela":1562.19,"saldo_devedor":268696.68,"tx":0.01,"credito_tyago":128005.46119538264},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1548,"cota":"1679-5","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":97790.12,"prazo_a_pagar":198,"valor_parcela":572.67,"saldo_devedor":113388.66,"tx":0.01,"credito_tyago":49282.045905692},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1549,"cota":"1281-6","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":233797.22,"prazo_a_pagar":133,"valor_parcela":1298.05,"saldo_devedor":172640.65,"tx":0.01,"credito_tyago":95246.99139619633},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1549,"cota":"1284-1","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":187134.12,"prazo_a_pagar":135,"valor_parcela":1074.66,"saldo_devedor":145079.1,"tx":0.01,"credito_tyago":79419.05107589095},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1550,"cota":"1682-2","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":340807.47,"prazo_a_pagar":136,"valor_parcela":1887.89,"saldo_devedor":256753.04,"tx":0.01,"credito_tyago":140005.84868662473},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1551,"cota":"1614-2","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":122872.54,"prazo_a_pagar":205,"valor_parcela":632.8,"saldo_devedor":129724,"tx":0.01,"credito_tyago":55050.284062839586},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1552,"cota":"660-5","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":229236.16,"prazo_a_pagar":119,"valor_parcela":1396.45,"saldo_devedor":166177.55,"tx":0.01,"credito_tyago":96910.17693065219},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1554,"cota":"5652-1","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":114518.63,"prazo_a_pagar":141,"valor_parcela":639.86,"saldo_devedor":90220.26,"tx":0.01,"credito_tyago":48254.4592958923},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1555,"cota":"232-8","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":118725.05,"prazo_a_pagar":214,"valor_parcela":659.31,"saldo_devedor":141092.34,"tx":0.01,"credito_tyago":58091.00702720918},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1556,"cota":"608-5","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":294467.77,"prazo_a_pagar":132,"valor_parcela":1853.77,"saldo_devedor":244597.64,"tx":0.01,"credito_tyago":135530.51827312674},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1557,"cota":"606-3","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":229098.71,"prazo_a_pagar":146,"valor_parcela":1195.79,"saldo_devedor":174585.34,"tx":0.01,"credito_tyago":91606.30274973632},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1557,"cota":"1687-5","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":228761.51,"prazo_a_pagar":109,"valor_parcela":1445.71,"saldo_devedor":157582.39,"tx":0.01,"credito_tyago":95699.97557224524},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1557,"cota":"5680-0","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":227045.5,"prazo_a_pagar":125,"valor_parcela":1324.63,"saldo_devedor":165578.75,"tx":0.01,"credito_tyago":94275.35612567984},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1559,"cota":"839-1","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":108054.52,"prazo_a_pagar":222,"valor_parcela":609.25,"saldo_devedor":135253.5,"tx":0.01,"credito_tyago":54234.623503181545},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1559,"cota":"2787-6","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":109414.63,"prazo_a_pagar":149,"valor_parcela":549.8,"saldo_devedor":81920.2,"tx":0.01,"credito_tyago":42496.96920507335},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1560,"cota":"1437-8","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":109968.61,"prazo_a_pagar":223,"valor_parcela":621.78,"saldo_devedor":138656.94,"tx":0.01,"credito_tyago":55417.63110269195},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1560,"cota":"2023-8","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":111046.38,"prazo_a_pagar":223,"valor_parcela":619.12,"saldo_devedor":138063.76,"tx":0.01,"credito_tyago":55180.552234389404},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1560,"cota":"2787-9","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":109228.44,"prazo_a_pagar":151,"valor_parcela":559.93,"saldo_devedor":84549.43,"tx":0.01,"credito_tyago":43530.4677369677},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1560,"cota":"2788-7","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":109228.44,"prazo_a_pagar":151,"valor_parcela":559.93,"saldo_devedor":84549.43,"tx":0.01,"credito_tyago":43530.4677369677},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1562,"cota":"449-5","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":108580.23,"prazo_a_pagar":227,"valor_parcela":616.45,"saldo_devedor":139934.15,"tx":0.01,"credito_tyago":55204.10813004254},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1562,"cota":"1569-1","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":86174.94,"prazo_a_pagar":227,"valor_parcela":493.22,"saldo_devedor":111960.94,"tx":0.01,"credito_tyago":44168.65960240016},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1563,"cota":"143-1","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":128123.75,"prazo_a_pagar":230,"valor_parcela":707.11,"saldo_devedor":162635.3,"tx":0.01,"credito_tyago":63540.14387278005},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1563,"cota":"449-0","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":115195.6,"prazo_a_pagar":229,"valor_parcela":652.13,"saldo_devedor":149377.77,"tx":0.01,"credito_tyago":58533.56722390239},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1563,"cota":"1202-6","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":129379.45,"prazo_a_pagar":230,"valor_parcela":705.61,"saldo_devedor":162290.3,"tx":0.01,"credito_tyago":63405.355486518834},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1566,"cota":"1437-5","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":106769.79,"prazo_a_pagar":229,"valor_parcela":597.19,"saldo_devedor":136756.51,"tx":0.01,"credito_tyago":53602.28943683356},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1567,"cota":"156-1","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":155839.23,"prazo_a_pagar":233,"valor_parcela":880.56,"saldo_devedor":205170.48,"tx":0.01,"credito_tyago":79388.79912451371},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1567,"cota":"278-9","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":158539.9,"prazo_a_pagar":233,"valor_parcela":876.85,"saldo_devedor":204306.05,"tx":0.01,"credito_tyago":79054.31601745462},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1567,"cota":"839-6","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":115195.6,"prazo_a_pagar":233,"valor_parcela":644.38,"saldo_devedor":150140.54,"tx":0.01,"credito_tyago":58095.4783090921},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1567,"cota":"1548-1","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":157084.91,"prazo_a_pagar":233,"valor_parcela":880.54,"saldo_devedor":205165.82,"tx":0.01,"credito_tyago":79386.99598107942},{"imovel_ref":"S. PRADI","garantia":"S. PRADI","adm":"SERVOPA","grupo":1568,"cota":"1759-4","inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":114282.1,"prazo_a_pagar":235,"valor_parcela":604.97,"saldo_devedor":142167.95,"tx":0.01,"credito_tyago":54659.713627920646},{"imovel_ref":"S. PRADI","garantia":"CLIENTE","adm":"EXEMPLO","grupo":null,"cota":null,"inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":136756.51,"valor_parcela":null,"saldo_devedor":136756.51,"tx":53602.28943683356,"credito_tyago":229},{"imovel_ref":"S. PRADI","garantia":"EMPREENDIMENTO","adm":"RESIDENCIAL EXEMPLO","grupo":null,"cota":null,"inicio":null,"lance_embutido":"CREDITO","lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":0,"valor_parcela":null,"saldo_devedor":204306.05,"tx":79054.31601745462,"credito_tyago":233},{"imovel_ref":"S. PRADI","garantia":"VALOR DO IMÓVEL","adm":1000000,"grupo":null,"cota":null,"inicio":null,"lance_embutido":"VALOR DA PARCELA","lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":0,"valor_parcela":null,"saldo_devedor":150140.54,"tx":58095.4783090921,"credito_tyago":233},{"imovel_ref":"S. PRADI","garantia":"VALOR NEGOCIADO","adm":1000000,"grupo":null,"cota":null,"inicio":null,"lance_embutido":null,"lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":null,"valor_parcela":null,"saldo_devedor":205165.82,"tx":79386.99598107942,"credito_tyago":233},{"imovel_ref":"S. PRADI","garantia":"ENTRADA","adm":200000,"grupo":null,"cota":null,"inicio":null,"lance_embutido":"DIF. GARANTIA (imóvel − cartas)","lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":863243.49,"valor_parcela":null,"saldo_devedor":142167.95,"tx":54659.713627920646,"credito_tyago":235},{"imovel_ref":"S. PRADI","garantia":"PERMUTA","adm":100000,"grupo":null,"cota":null,"inicio":null,"lance_embutido":"⚠ ALERTA (cartas > 80% imóvel)","lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":800000,"valor_parcela":null,"saldo_devedor":null,"tx":null,"credito_tyago":null},{"imovel_ref":"S. PRADI","garantia":"BALÃO","adm":400000,"grupo":null,"cota":null,"inicio":null,"lance_embutido":"⚠ PROVA REAL DE SALDO","lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":300000,"valor_parcela":null,"saldo_devedor":null,"tx":null,"credito_tyago":null},{"imovel_ref":"S. PRADI","garantia":"SALDO DEVEDOR","adm":300000,"grupo":null,"cota":null,"inicio":null,"lance_embutido":"Prova real de saldo: se der se (+) ajustar / se der (-) ok","lance_dinheiro":null,"credito_atualizado":null,"prazo_a_pagar":null,"valor_parcela":null,"saldo_devedor":null,"tx":null,"credito_tyago":null}],"exportado_em":"26/06/2026 11:26"};
+
+// ── State ──────────────────────────────────────────────────────────────
+let S = JSON.parse(localStorage.getItem('yatil_s2') || 'null') || JSON.parse(JSON.stringify(D0));
+function saveS(){ try{ localStorage.setItem('yatil_s2', JSON.stringify(S)); }catch(e){} }
+function resetAll(){
+  if(!confirm('Resetar todos os dados para o original do Excel?')) return;
+  localStorage.removeItem('yatil_s2');
+  S = JSON.parse(JSON.stringify(D0));
+  filterPat(); filterCom(); renderCartas();
+}
+
+// ── Utils ──────────────────────────────────────────────────────────────
+const fmtR = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:0}).format(n||0);
+const fmtP = n => n!=null?(n*100).toFixed(1).replace('.',',')+'%':'-';
+const fmtN = (n,d=2) => n!=null?Number(n).toFixed(d).replace('.',','):'-';
+const fmtNm = n => n!=null?new Intl.NumberFormat('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}).format(n):'-';
+
+function badge(s){
+  const m={'À VENDA':'b-venda','ESTOQUE':'b-estoque','EM USO':'b-uso','LOCADO':'b-locado','DISPONÍVEL':'b-disp','EXCLUSIVO':'b-excl','VENDIDO':'b-estoque'};
+  return `<span class="b ${m[s]||'b-estoque'}">${s}</span>`;
+}
+function semC(v){ return v>=0.20?'sem-r':v>=0.10?'sem-y':'sem-g'; }
+function semL(v){ return v>=0.20?'🔴 VENDER JÁ':v>=0.10?'🟡 AVALIAR':'🟢 MANTER'; }
+
+// ── Navigation ─────────────────────────────────────────────────────────
+function go(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on'); document.getElementById(id).classList.add('on');
+  if(id==='painel' && !window._newsLoaded) loadNews();
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// PAINEL
+// ══════════════════════════════════════════════════════════════════════
+function renderPainel(){
+  const pat = S.patrimonio;
+  const sem = [...pat].filter(p=>p.pct_ao_ano>0&&p.imovel)
+    .sort((a,b)=>b.pct_ao_ano-a.pct_ao_ano).slice(0,12);
+
+  const semRows = sem.map(p=>`<tr>
+    <td>${p.imovel} <span class="gray">/ ${p.unidade||'-'}</span></td>
+    <td class="gray">${p.disposicao||'-'}</td>
+    <td class="r ${semC(p.pct_ao_ano)}">${fmtP(p.pct_ao_ano)}</td>
+    <td class="r ${semC(p.pct_ao_ano)}">${fmtP(p.valorizacao_pct)}</td>
+    <td class="r gray">${fmtN(p.tempo_anos,1)} a</td>
+    <td><span class="${semC(p.pct_ao_ano)}">${semL(p.pct_ao_ano)}</span></td>
+    <td class="r">${fmtR(p.valor_tabela)}</td>
+  </tr>`).join('');
+
+  document.getElementById('painel').innerHTML = `
+  <div class="news-header">
+    <h3 style="margin:0">◆ Notícias Imobiliárias do Dia</h3>
+    <button class="news-refresh" onclick="loadNews(true)">⟳ Atualizar</button>
+  </div>
+  <div class="news-grid" id="news-grid"><div class="news-loading">Carregando notícias...</div></div>
+
+  <h3>◆ Semáforo de Valorização — Melhores Momentos de Venda</h3>
+  <div class="tw" style="max-height:none">
+    <table><thead><tr>
+      <th>Imóvel / Unidade</th><th>Tipo</th>
+      <th class="r">% ao Ano</th><th class="r">Valoriz. Total</th>
+      <th class="r">Tempo</th><th>Status</th><th class="r">Valor Tabela</th>
+    </tr></thead>
+    <tbody>${semRows}</tbody></table>
+  </div>
+  <p style="font-size:10px;color:#6e7681;margin-top:-10px;margin-bottom:16px">ℹ Ordenado por % ao ano · dados da aba Patrimônio</p>
+  `;
+}
+
+// News fetch
+async function loadNews(force){
+  if(!force && window._newsLoaded) return;
+  window._newsLoaded = true;
+  const grid = document.getElementById('news-grid');
+  if(!grid) return;
+  grid.innerHTML = '<div class="news-loading">🔄 Buscando notícias...</div>';
+
+  const feeds = [
+    'https://news.google.com/rss/search?q=mercado+imobili%C3%A1rio+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419',
+    'https://www.infomoney.com.br/rss/',
+    'https://rss.g1.globo.com/globo/economia/rss2.xml',
+  ];
+
+  for(const feed of feeds){
+    try{
+      const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed)}&count=7`;
+      const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+      const data = await r.json();
+      if(data.status==='ok' && data.items && data.items.length > 0){
+        renderNewsCards(data.items.slice(0,7));
+        return;
+      }
+    }catch(e){ continue; }
+  }
+  grid.innerHTML = '<div class="news-err">⚠ Não foi possível carregar notícias. Verifique a conexão e tente novamente.</div>';
+}
+
+function renderNewsCards(items){
+  const grid = document.getElementById('news-grid');
+  if(!grid) return;
+  grid.innerHTML = items.map(item=>{
+    const date = item.pubDate ? new Date(item.pubDate).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+    const raw = item.description||'';
+    const desc = raw.replace(/<[^>]*>/g,'').replace(/&[a-z]+;/g,' ').trim().slice(0,140);
+    const src = item.author||new URL(item.link||'https://news.google.com').hostname.replace('www.','');
+    const title = (item.title||'').replace(/&[a-z]+;/g,' ');
+    return `<div class="news-card" onclick="window.open('${item.link}','_blank')">
+      <div class="news-src">${src}</div>
+      <div class="news-title">${title}</div>
+      <div class="news-desc">${desc||'Clique para ler mais...'}</div>
+      <div class="news-date">${date}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// PATRIMÔNIO
+// ══════════════════════════════════════════════════════════════════════
+let _patFiltered = [];
+let _editingIdx  = null;
+
+function renderPatrimonio(){
+  const secs = [...new Set(S.patrimonio.map(p=>p.secao).filter(Boolean))];
+  const opts = secs.map(s=>`<option value="${s}">${s.replace('▶  ','').replace('▶ ','')}</option>`).join('');
+  document.getElementById('patrimonio').innerHTML = `
+  <div class="fbar">
+    <select id="pf-sec" onchange="filterPat()"><option value="">Todos empreendimentos</option>${opts}</select>
+    <select id="pf-st"  onchange="filterPat()">
+      <option value="">Todos status</option>
+      <option>À VENDA</option><option>ESTOQUE</option><option>EM USO</option>
+      <option>LOCADO</option><option>DISPONÍVEL</option><option>EXCLUSIVO</option>
+    </select>
+    <input id="pf-q" placeholder="Buscar..." oninput="filterPat()">
+    <span class="cnt-lbl" id="pf-cnt"></span>
+    <button class="btn" onclick="resetAll()" style="margin-left:auto">↩ Resetar dados</button>
+  </div>
+  <div id="pat-tbar" class="tbar"></div>
+  <div class="tw" id="pat-tw">
+    <table style="min-width:1800px">
+      <thead><tr>
+        <th></th>
+        <th>Status</th><th>Imóvel</th><th>Unidade</th><th>Tipo</th><th class="r">Vagas</th>
+        <th class="r">m² INT</th><th class="r">m² TOT</th><th class="r">Dt.Aquis.</th>
+        <th class="r">Valor Inicial</th><th class="r">Pretendido</th><th class="r">Valor Atual</th>
+        <th class="r">% Marg.</th><th class="r">Tabela</th><th class="r">Desc.Máx.</th>
+        <th class="r">R$/m²tot</th><th class="r">Valoriz.%</th>
+        <th class="r">Tempo(a)</th><th class="r">%/ano</th>
+        <th class="r">Loc.Base</th><th class="r">Loc.Tab.</th>
+        <th class="r">Custo/Mês</th><th class="r">IPTU Anual</th>
+        <th>Observações</th><th>Link</th>
+      </tr></thead>
+      <tbody id="pat-body"></tbody>
+      <tfoot><tr>
+        <td class="tfl">TOTAL</td>
+        <td class="tfl" colspan="3" id="pf-total-cnt"></td>
+        <td colspan="4"></td>
+        <td class="r" id="pf-total-vi"></td>
+        <td class="r" id="pf-total-vp"></td>
+        <td class="r" id="pf-total-va"></td>
+        <td></td>
+        <td class="r" id="pf-total-vt"></td>
+        <td colspan="12"></td>
+      </tr></tfoot>
+    </table>
+  </div>`;
+  filterPat();
+}
+
+function filterPat(){
+  const sec = document.getElementById('pf-sec')?.value||'';
+  const st  = document.getElementById('pf-st')?.value||'';
+  const q   = (document.getElementById('pf-q')?.value||'').toLowerCase();
+  let rows = S.patrimonio;
+  if(sec) rows = rows.filter(r=>r.secao===sec);
+  if(st)  rows = rows.filter(r=>r.status===st);
+  if(q)   rows = rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q));
+  _patFiltered = rows;
+
+  // Totals bar
+  const tAt=rows.reduce((s,r)=>s+(r.valor_atual||0),0);
+  const tTb=rows.reduce((s,r)=>s+(r.valor_tabela||0),0);
+  const tIn=rows.reduce((s,r)=>s+(r.valor_inicial||0),0);
+  const tPt=rows.reduce((s,r)=>s+(r.valor_pretend||0),0);
+  const tbar=document.getElementById('pat-tbar');
+  if(tbar) tbar.innerHTML=`
+    <div class="ti"><div class="tv">${rows.length}</div><div class="tl">Unidades</div></div>
+    <div class="ti"><div class="tv">${fmtR(tIn)}</div><div class="tl">Custo Total</div></div>
+    <div class="ti"><div class="tv" style="color:#79b8ff">${fmtR(tAt)}</div><div class="tl">Valor Atual</div></div>
+    <div class="ti"><div class="tv">${fmtR(tPt)}</div><div class="tl">Pretendido</div></div>
+    <div class="ti"><div class="tv" style="color:#3fb950">${fmtR(tTb)}</div><div class="tl">VGV Tabela</div></div>
+  `;
+
+  // Update tfoot
+  const el = id => document.getElementById(id);
+  if(el('pf-total-cnt'))  el('pf-total-cnt').textContent  = rows.length+' unidades';
+  if(el('pf-total-vi'))   el('pf-total-vi').textContent   = fmtR(tIn);
+  if(el('pf-total-vp'))   el('pf-total-vp').textContent   = fmtR(tPt);
+  if(el('pf-total-va'))   el('pf-total-va').textContent   = fmtR(tAt);
+  if(el('pf-total-vt'))   el('pf-total-vt').textContent   = fmtR(tTb);
+  if(el('pf-cnt'))        el('pf-cnt').textContent        = rows.length+' imóveis';
+
+  // Group by section and render
+  const byS = {};
+  rows.forEach(r=>{(byS[r.secao||'']=(byS[r.secao||'']||[])).push(r)});
+
+  let html='';
+  let globalIdx=0;
+  for(const [sec2,items] of Object.entries(byS)){
+    const label=sec2.replace('▶  ','').replace('▶ ','');
+    const secAt=items.reduce((s,r)=>s+(r.valor_atual||0),0);
+    const secTb=items.reduce((s,r)=>s+(r.valor_tabela||0),0);
+    html+=`<tr class="sec-row"><td colspan="25">
+      ${label} · ${items.length} un. · Atual: ${fmtR(secAt)} · VGV: ${fmtR(secTb)}
+      &nbsp;&nbsp;<button class="btn" style="font-size:10px;padding:2px 8px" onclick="openPctModal('${sec2.replace(/'/g,"\'")}',${JSON.stringify(sec2)})">✏ +%</button>
+    </td></tr>`;
+    items.forEach(r=>{
+      const idx=S.patrimonio.indexOf(r);
+      const link=r.link_venda?`<a href="${r.link_venda}" target="_blank">🔗</a>`:'';
+      const cls=r.pct_ao_ano>=0.2?'red':r.pct_ao_ano>=0.1?'yellow':'green';
+      html+=`<tr id="row-${idx}">
+        <td><button class="btn" style="font-size:10px;padding:2px 7px" onclick="toggleEdit(${idx})">✏</button></td>
+        <td>${badge(r.status)}</td>
+        <td style="font-weight:600">${r.imovel||'-'}</td>
+        <td>${r.unidade||'-'}</td>
+        <td class="gray">${r.disposicao||'-'}</td>
+        <td class="r">${r.vagas??'-'}</td>
+        <td class="r">${fmtN(r.area_int)}</td>
+        <td class="r">${fmtN(r.area_tot)}</td>
+        <td class="r gray">${r.data_aquis?r.data_aquis.slice(0,7):'-'}</td>
+        <td class="r">${fmtR(r.valor_inicial)}</td>
+        <td class="r">${fmtR(r.valor_pretend)}</td>
+        <td class="r" style="color:#79b8ff">${fmtR(r.valor_atual)}</td>
+        <td class="r">${fmtP(r.pct_marg_tabela)}</td>
+        <td class="r green">${fmtR(r.valor_tabela)}</td>
+        <td class="r gray">${fmtR(r.desc_max)}</td>
+        <td class="r">${r.rpsm2_total?'R$'+fmtNm(r.rpsm2_total):'-'}</td>
+        <td class="r ${cls}">${fmtP(r.valorizacao_pct)}</td>
+        <td class="r gray">${fmtN(r.tempo_anos,1)}</td>
+        <td class="r ${cls}">${fmtP(r.pct_ao_ano)}</td>
+        <td class="r">${fmtR(r.loc_base)}</td>
+        <td class="r">${fmtR(r.loc_tabela)}</td>
+        <td class="r ${r.custo_mensal?'red':'gray'}">${fmtR(r.custo_mensal)}</td>
+        <td class="r">${fmtR(r.iptu_anual)}</td>
+        <td class="gray" style="max-width:170px;overflow:hidden;text-overflow:ellipsis" title="${(r.observacoes||'').replace(/"/g,'&quot;')}">${r.observacoes||''}</td>
+        <td>${link}</td>
+      </tr>`;
+      html+=`<tr id="edit-${idx}" style="display:none" class="edit-row"><td colspan="25">
+        <div class="edit-form">
+          <div class="edit-field"><label>Valor Atual (R$)</label><input type="number" id="ef-va-${idx}" value="${r.valor_atual||0}" step="1000"></div>
+          <div class="edit-field"><label>Valor Pretendido (R$)</label><input type="number" id="ef-vp-${idx}" value="${r.valor_pretend||0}" step="1000"></div>
+          <div class="edit-field"><label>Valor Tabela (R$)</label><input type="number" id="ef-vt-${idx}" value="${r.valor_tabela||0}" step="1000"></div>
+          <div class="edit-field"><label>Status</label>
+            <select id="ef-st-${idx}" style="background:#161b22;border:1px solid #30363d;color:#e2e8f0;padding:5px 8px;border-radius:5px;font-size:12px">
+              ${['À VENDA','ESTOQUE','EM USO','LOCADO','DISPONÍVEL','EXCLUSIVO'].map(s=>`<option${r.status===s?' selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+          <div class="edit-field"><label>Observações</label><textarea id="ef-ob-${idx}">${r.observacoes||''}</textarea></div>
+          <div style="display:flex;gap:6px;align-self:flex-end">
+            <button class="btn green" onclick="saveEdit(${idx})">✓ Salvar</button>
+            <button class="btn" onclick="cancelEdit(${idx})">✕</button>
+          </div>
+        </div>
+      </td></tr>`;
+      globalIdx++;
+    });
+  }
+  const body=document.getElementById('pat-body');
+  if(body) body.innerHTML=html||'<tr><td colspan="25" style="padding:30px;text-align:center;color:#6e7681">Nenhum resultado</td></tr>';
+}
+
+function toggleEdit(idx){
+  const row=document.getElementById(`edit-${idx}`);
+  if(!row) return;
+  const open=row.style.display==='none'||row.style.display==='';
+  // Close all others
+  document.querySelectorAll('.edit-row').forEach(r=>r.style.display='none');
+  row.style.display=open?'table-row':'none';
+  _editingIdx=open?idx:null;
+}
+function cancelEdit(idx){
+  const row=document.getElementById(`edit-${idx}`);
+  if(row) row.style.display='none';
+}
+function saveEdit(idx){
+  const r=S.patrimonio[idx];
+  if(!r) return;
+  const g=id=>document.getElementById(id);
+  r.valor_atual   = parseFloat(g(`ef-va-${idx}`)?.value)||r.valor_atual;
+  r.valor_pretend = parseFloat(g(`ef-vp-${idx}`)?.value)||r.valor_pretend;
+  r.valor_tabela  = parseFloat(g(`ef-vt-${idx}`)?.value)||r.valor_tabela;
+  r.status        = g(`ef-st-${idx}`)?.value||r.status;
+  r.observacoes   = g(`ef-ob-${idx}`)?.value||r.observacoes;
+  saveS(); filterPat();
+}
+
+// % modal
+let _pctSecao='';
+function openPctModal(secao){
+  _pctSecao=secao;
+  const count=S.patrimonio.filter(p=>p.secao===secao).length;
+  const label=secao.replace('▶  ','').replace('▶ ','');
+  document.getElementById('pct-desc').textContent=`${label} · ${count} unidades`;
+  document.getElementById('pct-input').value='';
+  document.getElementById('pct-modal').style.display='block';
+  document.getElementById('overlay').style.display='block';
+  document.getElementById('pct-input').focus();
+}
+function closePctModal(){
+  document.getElementById('pct-modal').style.display='none';
+  document.getElementById('overlay').style.display='none';
+}
+function applyPct(){
+  const pct=parseFloat(document.getElementById('pct-input').value);
+  if(isNaN(pct)){closePctModal();return;}
+  const mult=1+pct/100;
+  S.patrimonio.filter(p=>p.secao===_pctSecao).forEach(p=>{
+    if(p.valor_atual)   p.valor_atual   = Math.round(p.valor_atual   * mult);
+    if(p.valor_tabela)  p.valor_tabela  = Math.round(p.valor_tabela  * mult);
+    if(p.valor_pretend) p.valor_pretend = Math.round(p.valor_pretend * mult);
+    if(p.loc_base)      p.loc_base      = Math.round(p.loc_base      * mult);
+    if(p.loc_tabela)    p.loc_tabela    = Math.round(p.loc_tabela    * mult);
+  });
+  saveS(); closePctModal(); filterPat();
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// COMERCIAL
+// ══════════════════════════════════════════════════════════════════════
+let _comFiltered = [];
+function renderComercial(){
+  const secs=[...new Set(S.comercial.map(c=>c.secao).filter(Boolean))];
+  const opts=secs.map(s=>`<option value="${s}">${s.replace('▶  ','').replace('▶ ','')}</option>`).join('');
+  document.getElementById('comercial').innerHTML=`
+  <div class="fbar">
+    <select id="cf-sec" onchange="filterCom()"><option value="">Todos empreendimentos</option>${opts}</select>
+    <select id="cf-st"  onchange="filterCom()">
+      <option value="">Todos status</option>
+      <option>À VENDA</option><option>EXCLUSIVO</option><option>DISPONÍVEL</option><option>ESTOQUE</option>
+    </select>
+    <input id="cf-q" placeholder="Buscar..." oninput="filterCom()">
+    <span class="cnt-lbl" id="cf-cnt"></span>
+  </div>
+  <div id="com-tbar" class="tbar"></div>
+  <div class="print-bar" style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+    <button class="btn" onclick="selectAllCom(true)">☑ Selec. todos</button>
+    <button class="btn" onclick="selectAllCom(false)">☐ Limpar</button>
+    <button class="btn green" onclick="printCom(true)">🖨 Imprimir selecionados</button>
+    <button class="btn green" onclick="printCom(false)">🖨 Imprimir tudo</button>
+    <span id="com-sel-cnt" class="cnt-lbl"></span>
+  </div>
+  <div class="tw"><table id="com-table">
+    <thead><tr>
+      <th><input type="checkbox" class="cb" id="com-all-cb" onchange="selectAllCom(this.checked)" title="Selecionar tudo"></th>
+      <th>Status</th><th>Empreendimento</th><th>Unidade</th><th>Tipo</th><th class="r">Vagas</th>
+      <th class="r">m² INT</th><th class="r">m² TOT</th><th class="r">R$/m²</th>
+      <th class="r">Valor Tabela</th><th class="r">Loc.Tabela</th><th>Observações</th><th>Link</th>
+    </tr></thead>
+    <tbody id="com-body"></tbody>
+  </table></div>`;
+  filterCom();
+}
+
+function filterCom(){
+  const sec=(document.getElementById('cf-sec')?.value||'');
+  const st =(document.getElementById('cf-st')?.value||'');
+  const q  =(document.getElementById('cf-q')?.value||'').toLowerCase();
+  let rows=S.comercial;
+  if(sec) rows=rows.filter(r=>r.secao===sec);
+  if(st)  rows=rows.filter(r=>r.status===st);
+  if(q)   rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q));
+  _comFiltered=rows;
+
+  const tot=rows.reduce((s,r)=>s+(r.valor_tabela||0),0);
+  const tbar=document.getElementById('com-tbar');
+  if(tbar) tbar.innerHTML=`
+    <div class="ti"><div class="tv">${rows.length}</div><div class="tl">Unidades</div></div>
+    <div class="ti"><div class="tv" style="color:#3fb950">${fmtR(tot)}</div><div class="tl">VGV Total</div></div>
+    <div class="ti"><div class="tv">${fmtR(tot/Math.max(rows.length,1))}</div><div class="tl">Ticket Médio</div></div>
+  `;
+
+  const byS={};
+  rows.forEach((r,i)=>{ r._idx=i; (byS[r.secao||'']=(byS[r.secao||'']||[])).push(r)});
+
+  let html='';
+  for(const [sec2,items] of Object.entries(byS)){
+    const label=sec2.replace('▶  ','').replace('▶ ','');
+    html+=`<tr class="sec-row"><td colspan="13">${label} · ${items.length} unid.</td></tr>`;
+    items.forEach((r,li)=>{
+      const link=r.link_venda?`<a href="${r.link_venda}" target="_blank">🔗</a>`:'';
+      html+=`<tr>
+        <td><input type="checkbox" class="cb com-cb" data-idx="${r._idx}"></td>
+        <td>${badge(r.status)}</td>
+        <td>${r.imovel||'-'}</td>
+        <td style="font-weight:600">${r.unidade||'-'}</td>
+        <td class="gray">${r.disposicao||'-'}</td>
+        <td class="r">${r.vagas??'-'}</td>
+        <td class="r">${fmtN(r.area_int)}</td>
+        <td class="r">${fmtN(r.area_tot)}</td>
+        <td class="r">${r.rpsm2_total?'R$'+fmtNm(r.rpsm2_total):'-'}</td>
+        <td class="r green">${fmtR(r.valor_tabela)}</td>
+        <td class="r">${r.loc_tabela?fmtR(r.loc_tabela):'-'}</td>
+        <td class="gray" style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${r.observacoes||''}</td>
+        <td>${link}</td>
+      </tr>`;
+    });
+  }
+  const body=document.getElementById('com-body');
+  if(body) body.innerHTML=html||'<tr><td colspan="13" style="padding:30px;text-align:center;color:#6e7681">Nenhum resultado</td></tr>';
+  document.getElementById('cf-cnt').textContent=rows.length+' un.';
+  updateComSelCount();
+  document.querySelectorAll('.com-cb').forEach(cb=>cb.addEventListener('change',updateComSelCount));
+}
+
+function selectAllCom(v){
+  document.querySelectorAll('.com-cb').forEach(cb=>cb.checked=v);
+  const all=document.getElementById('com-all-cb');
+  if(all) all.checked=v;
+  updateComSelCount();
+}
+function updateComSelCount(){
+  const n=document.querySelectorAll('.com-cb:checked').length;
+  const el=document.getElementById('com-sel-cnt');
+  if(el) el.textContent=n>0?n+' selecionados':'';
+}
+
+function printCom(selectedOnly){
+  const checkedIdx=selectedOnly
+    ? [...document.querySelectorAll('.com-cb:checked')].map(cb=>parseInt(cb.dataset.idx))
+    : null;
+  const rows = checkedIdx
+    ? checkedIdx.map(i=>_comFiltered[i]).filter(Boolean)
+    : _comFiltered;
+  if(!rows.length){ alert('Nenhuma unidade selecionada.'); return; }
+
+  const tRows=rows.map(r=>`<tr>
+    <td>${r.status}</td>
+    <td>${r.imovel||'-'}</td>
+    <td><strong>${r.unidade||'-'}</strong></td>
+    <td>${r.disposicao||'-'}</td>
+    <td align="right">${r.vagas??'-'}</td>
+    <td align="right">${fmtN(r.area_int)}</td>
+    <td align="right">${fmtN(r.area_tot)}</td>
+    <td align="right">${r.rpsm2_total?'R$'+fmtNm(r.rpsm2_total):'-'}</td>
+    <td align="right"><strong>${fmtR(r.valor_tabela)}</strong></td>
+    <td align="right">${r.loc_tabela?fmtR(r.loc_tabela):'-'}</td>
+    <td>${r.observacoes||''}</td>
+  </tr>`).join('');
+
+  const tot=rows.reduce((s,r)=>s+(r.valor_tabela||0),0);
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head>
+  <meta charset="UTF-8"><title>Grupo Yatil — Tabela Comercial</title>
+  <style>
+    body{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;margin:20px;color:#111}
+    h1{font-size:15px;margin-bottom:4px}p.sub{font-size:10px;color:#666;margin-bottom:14px}
+    table{border-collapse:collapse;width:100%}
+    th{background:#1a3a6e;color:#fff;padding:7px 9px;text-align:left;font-size:10px;text-transform:uppercase}
+    td{padding:6px 9px;border-bottom:1px solid #e5e5e5;vertical-align:top}
+    tr:nth-child(even){background:#f8f8f8}
+    tfoot td{background:#e8effa;font-weight:700;border-top:2px solid #1a3a6e}
+    @media print{@page{margin:1cm}}
+  </style></head><body>
+  <h1>Grupo Yatil — Tabela Comercial</h1>
+  <p class="sub">Gerado em ${new Date().toLocaleDateString('pt-BR')} · ${rows.length} unidades</p>
+  <table>
+  <thead><tr><th>Status</th><th>Empreendimento</th><th>Unidade</th><th>Tipo</th>
+  <th>Vagas</th><th>m²INT</th><th>m²TOT</th><th>R$/m²</th><th>Valor Tabela</th><th>Loc.Tabela</th><th>Observações</th></tr></thead>
+  <tbody>${tRows}</tbody>
+  <tfoot><tr><td colspan="8" align="right">TOTAL VGV:</td><td><strong>${fmtR(tot)}</strong></td><td colspan="2"></td></tr></tfoot>
+  </table></body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),400);
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// CARTAS
+// ══════════════════════════════════════════════════════════════════════
+function renderCartas(){
+  const car=S.cartas;
+  const groups={};
+  car.forEach(c=>{(groups[c.imovel_ref||'']=(groups[c.imovel_ref||'']||[])).push(c)});
+  const totS=car.reduce((s,c)=>s+(c.saldo_devedor||0),0);
+  const totC=car.reduce((s,c)=>s+(c.credito_tyago||0),0);
+  const totP=car.reduce((s,c)=>s+(c.valor_parcela||0),0);
+  const totA=car.reduce((s,c)=>s+(c.credito_atualizado||0),0);
+
+  let html=`<div class="tbar">
+    <div class="ti"><div class="tv">${car.length}</div><div class="tl">Cartas Ativas</div></div>
+    <div class="ti"><div class="tv red">${fmtR(totS)}</div><div class="tl">Saldo Devedor</div></div>
+    <div class="ti"><div class="tv">${fmtR(totA)}</div><div class="tl">Crédito Atualizado</div></div>
+    <div class="ti"><div class="tv green">${fmtR(totC)}</div><div class="tl">Crédito Tyago</div></div>
+    <div class="ti"><div class="tv yellow">${fmtR(totP)}</div><div class="tl">Parcela Mensal Total</div></div>
+  </div>
+  <div class="tw">
+  <table><thead><tr>
+    <th>Garantia</th><th>ADM</th><th>Grupo</th><th>Cota</th>
+    <th class="r">Início</th><th class="r">Lance Emb.</th><th class="r">Lance Din.</th>
+    <th class="r">Créd.Atual.</th><th class="r">Prazo(m)</th>
+    <th class="r">Parcela</th><th class="r">Saldo Dev.</th><th class="r">TX</th><th class="r">Créd.Tyago</th>
+  </tr></thead><tbody>`;
+
+  for(const [ref,items] of Object.entries(groups)){
+    const gS=items.reduce((s,c)=>s+(c.saldo_devedor||0),0);
+    const gC=items.reduce((s,c)=>s+(c.credito_tyago||0),0);
+    const gP=items.reduce((s,c)=>s+(c.valor_parcela||0),0);
+    const gA=items.reduce((s,c)=>s+(c.credito_atualizado||0),0);
+    html+=`<tr class="sec-row"><td colspan="13">📌 ${ref} · ${items.length} cartas · Saldo: ${fmtR(gS)} · Créd.Tyago: ${fmtR(gC)}</td></tr>`;
+    items.forEach(c=>{
+      html+=`<tr>
+        <td style="font-weight:600">${c.garantia||'-'}</td>
+        <td class="gray">${c.adm||'-'}</td><td class="gray">${c.grupo||'-'}</td>
+        <td class="gray">${c.cota||'-'}</td>
+        <td class="r gray">${c.inicio||'-'}</td>
+        <td class="r">${fmtR(c.lance_embutido)}</td>
+        <td class="r">${fmtR(c.lance_dinheiro)}</td>
+        <td class="r green">${fmtR(c.credito_atualizado)}</td>
+        <td class="r gray">${c.prazo_a_pagar||'-'}</td>
+        <td class="r yellow">${fmtR(c.valor_parcela)}</td>
+        <td class="r red">${fmtR(c.saldo_devedor)}</td>
+        <td class="r gray">${c.tx!=null?(c.tx*100).toFixed(2).replace('.',',')+'%':'-'}</td>
+        <td class="r green">${fmtR(c.credito_tyago)}</td>
+      </tr>`;
+    });
+    html+=`<tr style="background:#1c2433"><td colspan="7" style="text-align:right;color:#6e7681;font-size:10px">Subtotal ${ref} →</td>
+      <td class="r" style="color:#79b8ff;font-weight:600">${fmtR(gA)}</td><td></td>
+      <td class="r" style="color:#e3b341;font-weight:600">${fmtR(gP)}</td>
+      <td class="r" style="color:#f85149;font-weight:600">${fmtR(gS)}</td><td></td>
+      <td class="r" style="color:#3fb950;font-weight:600">${fmtR(gC)}</td></tr>`;
+  }
+  html+=`</tbody>
+    <tfoot><tr><td colspan="7" style="text-align:right">TOTAL GERAL →</td>
+      <td class="r">${fmtR(totA)}</td><td></td>
+      <td class="r">${fmtR(totP)}</td><td class="r">${fmtR(totS)}</td><td></td>
+      <td class="r">${fmtR(totC)}</td>
+    </tr></tfoot>
+  </table></div>`;
+  document.getElementById('cartas').innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// VENDIDOS
+// ══════════════════════════════════════════════════════════════════════
+function renderVendidos(){
+  document.getElementById('vendidos').innerHTML=`<div style="padding:40px;text-align:center;color:#6e7681">
+    <p style="font-size:18px;margin-bottom:8px">📋 Histórico de Vendidos</p>
+    <p>Dados a serem importados em próxima etapa.</p>
+  </div>`;
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────
+document.getElementById('stamp').textContent='Exportado: '+D0.exportado_em;
+renderPainel();
+renderComercial();
+renderPatrimonio();
+renderCartas();
+renderVendidos();
+loadNews();
+</script>
+</body>
+</html>
