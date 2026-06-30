@@ -292,10 +292,10 @@ function renderPatrimonio(){
   </div>
   <div id="pat-tbar" class="tbar"></div>
   <div class="tw" id="pat-tw">
-    <table style="min-width:1800px">
+    <table style="min-width:1950px">
       <thead><tr>
         <th></th>
-        <th>Status</th><th>Imóvel</th><th>Unidade</th><th>Tipo</th><th class="r">Vagas</th>
+        <th>Status</th><th>Imóvel</th><th>Unidade</th><th>Matrícula</th><th>Tipo</th><th class="r">Vagas</th>
         <th class="r">m² INT</th><th class="r">m² TOT</th><th class="r">Dt.Aquis.</th>
         <th class="r">Valor Inicial</th><th class="r">Pretendido</th><th class="r">Valor Atual</th>
         <th class="r">% Marg.</th><th class="r">Tabela</th><th class="r">Desc.Máx.</th>
@@ -309,7 +309,7 @@ function renderPatrimonio(){
       <tfoot><tr>
         <td class="tfl">TOTAL</td>
         <td class="tfl" colspan="3" id="pf-total-cnt"></td>
-        <td colspan="4"></td>
+        <td colspan="5"></td>
         <td class="r" id="pf-total-vi"></td>
         <td class="r" id="pf-total-vp"></td>
         <td class="r" id="pf-total-va"></td>
@@ -365,7 +365,7 @@ function filterPat(){
     const label=sec2.replace('▶  ','').replace('▶ ','');
     const secAt=items.reduce((s,r)=>s+(r.valor_atual||0),0);
     const secTb=items.reduce((s,r)=>s+(r.valor_tabela||0),0);
-    html+=`<tr class="sec-row"><td colspan="25">
+    html+=`<tr class="sec-row"><td colspan="26">
       ${label} · ${items.length} un. · Atual: ${fmtR(secAt)} · VGV: ${fmtR(secTb)}
       &nbsp;&nbsp;<button class="btn" style="font-size:10px;padding:2px 8px" onclick="openPctModal('${sec2.replace(/'/g,"\'")}',${JSON.stringify(sec2)})">✏ +%</button>
     </td></tr>`;
@@ -378,6 +378,7 @@ function filterPat(){
         <td>${badge(r.status)}</td>
         <td style="font-weight:600">${r.imovel||'-'}</td>
         <td>${r.unidade||'-'}</td>
+        <td class="gray">${r.matricula||'-'}</td>
         <td class="gray">${r.disposicao||'-'}</td>
         <td class="r">${r.vagas??'-'}</td>
         <td class="r">${fmtN(r.area_int)}</td>
@@ -400,17 +401,33 @@ function filterPat(){
         <td class="gray" style="max-width:170px;overflow:hidden;text-overflow:ellipsis" title="${(r.observacoes||'').replace(/"/g,'&quot;')}">${r.observacoes||''}</td>
         <td>${link}</td>
       </tr>`;
-      html+=`<tr id="edit-${idx}" style="display:none" class="edit-row"><td colspan="25">
+      html+=`<tr id="edit-${idx}" style="display:none" class="edit-row"><td colspan="26">
         <div class="edit-form">
-          <div class="edit-field"><label>Valor Atual (R$)</label><input type="number" id="ef-va-${idx}" value="${r.valor_atual||0}" step="1000"></div>
-          <div class="edit-field"><label>Valor Pretendido (R$)</label><input type="number" id="ef-vp-${idx}" value="${r.valor_pretend||0}" step="1000"></div>
-          <div class="edit-field"><label>Valor Tabela (R$)</label><input type="number" id="ef-vt-${idx}" value="${r.valor_tabela||0}" step="1000"></div>
           <div class="edit-field"><label>Status</label>
-            <select id="ef-st-${idx}" style="background:#161b22;border:1px solid #30363d;color:#e2e8f0;padding:5px 8px;border-radius:5px;font-size:12px">
+            <select id="ef-st-${idx}" style="background:#161b22;border:1px solid #30363d;color:#e2e8f0;padding:5px 8px;border-radius:5px;font-size:12px;width:140px">
               ${['À VENDA','ESTOQUE','EM USO','LOCADO','DISPONÍVEL','EXCLUSIVO'].map(s=>`<option${r.status===s?' selected':''}>${s}</option>`).join('')}
             </select>
           </div>
-          <div class="edit-field"><label>Observações</label><textarea id="ef-ob-${idx}">${r.observacoes||''}</textarea></div>
+          <div class="edit-field"><label>Imóvel</label><input type="text" id="ef-im-${idx}" value="${(r.imovel||'').replace(/"/g,'&quot;')}" style="width:160px"></div>
+          <div class="edit-field"><label>Unidade</label><input type="text" id="ef-un-${idx}" value="${(r.unidade||'').replace(/"/g,'&quot;')}" style="width:100px"></div>
+          <div class="edit-field"><label>Matrícula</label><input type="text" id="ef-mat-${idx}" value="${(r.matricula||'').replace(/"/g,'&quot;')}" style="width:110px"></div>
+          <div class="edit-field"><label>Disposição</label><input type="text" id="ef-disp-${idx}" value="${(r.disposicao||'').replace(/"/g,'&quot;')}" style="width:120px"></div>
+          <div class="edit-field"><label>Vagas</label><input type="number" id="ef-vag-${idx}" value="${r.vagas??''}" style="width:70px"></div>
+          <div class="edit-field"><label>m² INT</label><input type="number" id="ef-ai-${idx}" value="${r.area_int||''}" step="0.01" style="width:80px"></div>
+          <div class="edit-field"><label>m² TOT</label><input type="number" id="ef-at-${idx}" value="${r.area_tot||''}" step="0.01" style="width:80px"></div>
+          <div class="edit-field"><label>Dt.Aquisição</label><input type="date" id="ef-da-${idx}" value="${r.data_aquis||''}" style="width:130px"></div>
+          <div class="edit-field"><label>Valor Inicial (R$)</label><input type="number" id="ef-vi-${idx}" value="${r.valor_inicial||0}" step="1000"></div>
+          <div class="edit-field"><label>Valor Atual (R$)</label><input type="number" id="ef-va-${idx}" value="${r.valor_atual||0}" step="1000" oninput="calcTabela(${idx})"></div>
+          <div class="edit-field"><label>Valor Pretendido (R$)</label><input type="number" id="ef-vp-${idx}" value="${r.valor_pretend||0}" step="1000"></div>
+          <div class="edit-field"><label>% Marg. Tabela</label><input type="number" id="ef-pmt-${idx}" value="${r.pct_marg_tabela!=null?(r.pct_marg_tabela*100).toFixed(2):''}" step="0.1" style="width:100px" oninput="calcTabela(${idx})"></div>
+          <div class="edit-field"><label>Valor Tabela (auto)</label><input type="number" id="ef-vt-${idx}" value="${r.valor_tabela||0}" step="1000" readonly style="color:#3fb950;background:#0d1f11"></div>
+          <div class="edit-field"><label>Loc. Base (R$)</label><input type="number" id="ef-lb-${idx}" value="${r.loc_base||''}" step="100"></div>
+          <div class="edit-field"><label>% Marg. Loc.</label><input type="number" id="ef-pml-${idx}" value="${r.pct_marg_loc!=null?(r.pct_marg_loc*100).toFixed(2):''}" step="0.1" style="width:100px"></div>
+          <div class="edit-field"><label>Custo/Mês (R$)</label><input type="number" id="ef-cm-${idx}" value="${r.custo_mensal||''}" step="100"></div>
+          <div class="edit-field"><label>IPTU Anual (R$)</label><input type="number" id="ef-ip-${idx}" value="${r.iptu_anual||''}" step="100"></div>
+          <div class="edit-field"><label>Link Venda</label><input type="url" id="ef-lv-${idx}" value="${(r.link_venda||'').replace(/"/g,'&quot;')}" style="width:180px" placeholder="https://..."></div>
+          <div class="edit-field"><label>Link Locação</label><input type="url" id="ef-ll-${idx}" value="${(r.link_locacao||'').replace(/"/g,'&quot;')}" style="width:180px" placeholder="https://..."></div>
+          <div class="edit-field" style="width:220px"><label>Observações</label><textarea id="ef-ob-${idx}" style="width:220px">${r.observacoes||''}</textarea></div>
           <div style="display:flex;gap:6px;align-self:flex-end">
             <button class="btn green" onclick="saveEdit(${idx})">✓ Salvar</button>
             <button class="btn" onclick="cancelEdit(${idx})">✕</button>
@@ -421,7 +438,7 @@ function filterPat(){
     });
   }
   const body=document.getElementById('pat-body');
-  if(body) body.innerHTML=html||'<tr><td colspan="25" style="padding:30px;text-align:center;color:#6e7681">Nenhum resultado</td></tr>';
+  if(body) body.innerHTML=html||'<tr><td colspan="26" style="padding:30px;text-align:center;color:#6e7681">Nenhum resultado</td></tr>';
 }
 
 function toggleEdit(idx){
@@ -437,15 +454,43 @@ function cancelEdit(idx){
   const row=document.getElementById(`edit-${idx}`);
   if(row) row.style.display='none';
 }
+function calcTabela(idx){
+  const g=id=>document.getElementById(id);
+  const va=parseFloat(g(`ef-va-${idx}`)?.value)||0;
+  const pmt=parseFloat(g(`ef-pmt-${idx}`)?.value)||0;
+  const vt=Math.round(va*(1+pmt/100));
+  const el=g(`ef-vt-${idx}`);
+  if(el) el.value=vt||'';
+}
 function saveEdit(idx){
   const r=S.patrimonio[idx];
   if(!r) return;
   const g=id=>document.getElementById(id);
-  r.valor_atual   = parseFloat(g(`ef-va-${idx}`)?.value)||r.valor_atual;
-  r.valor_pretend = parseFloat(g(`ef-vp-${idx}`)?.value)||r.valor_pretend;
-  r.valor_tabela  = parseFloat(g(`ef-vt-${idx}`)?.value)||r.valor_tabela;
-  r.status        = g(`ef-st-${idx}`)?.value||r.status;
-  r.observacoes   = g(`ef-ob-${idx}`)?.value||r.observacoes;
+  const gv=(id,fallback)=>{const el=g(id);return el&&el.value.trim()!==''?el.value.trim():fallback;};
+  const gf=(id,fallback)=>{const v=parseFloat(g(id)?.value);return isNaN(v)?fallback:v;};
+  r.status        = gv(`ef-st-${idx}`,r.status);
+  r.imovel        = gv(`ef-im-${idx}`,r.imovel);
+  r.unidade       = gv(`ef-un-${idx}`,r.unidade);
+  r.matricula     = gv(`ef-mat-${idx}`,r.matricula);
+  r.disposicao    = gv(`ef-disp-${idx}`,r.disposicao);
+  r.vagas         = gf(`ef-vag-${idx}`,r.vagas);
+  r.area_int      = gf(`ef-ai-${idx}`,r.area_int);
+  r.area_tot      = gf(`ef-at-${idx}`,r.area_tot);
+  r.data_aquis    = gv(`ef-da-${idx}`,r.data_aquis);
+  r.valor_inicial = gf(`ef-vi-${idx}`,r.valor_inicial);
+  r.valor_atual   = gf(`ef-va-${idx}`,r.valor_atual);
+  r.valor_pretend = gf(`ef-vp-${idx}`,r.valor_pretend);
+  const pmt=parseFloat(g(`ef-pmt-${idx}`)?.value);
+  if(!isNaN(pmt)) r.pct_marg_tabela=pmt/100;
+  r.valor_tabela  = Math.round((r.valor_atual||0)*(1+(r.pct_marg_tabela||0)));
+  r.loc_base      = gf(`ef-lb-${idx}`,r.loc_base);
+  const pml=parseFloat(g(`ef-pml-${idx}`)?.value);
+  if(!isNaN(pml)) r.pct_marg_loc=pml/100;
+  r.custo_mensal  = gf(`ef-cm-${idx}`,r.custo_mensal);
+  r.iptu_anual    = gf(`ef-ip-${idx}`,r.iptu_anual);
+  r.link_venda    = gv(`ef-lv-${idx}`,r.link_venda);
+  r.link_locacao  = gv(`ef-ll-${idx}`,r.link_locacao);
+  r.observacoes   = g(`ef-ob-${idx}`)?.value??r.observacoes;
   saveS(); filterPat();
 }
 
@@ -640,7 +685,7 @@ function renderCartas(){
   const totP=car.reduce((s,c)=>s+(c.valor_parcela||0),0);
   const totA=car.reduce((s,c)=>s+(c.credito_atualizado||0),0);
 
-  let html=`<div class="tbar">
+  let tableHtml=`<div class="tbar">
     <div class="ti"><div class="tv">${car.length}</div><div class="tl">Cartas Ativas</div></div>
     <div class="ti"><div class="tv red">${fmtR(totS)}</div><div class="tl">Saldo Devedor</div></div>
     <div class="ti"><div class="tv">${fmtR(totA)}</div><div class="tl">Crédito Atualizado</div></div>
@@ -660,9 +705,9 @@ function renderCartas(){
     const gC=items.reduce((s,c)=>s+(c.credito_tyago||0),0);
     const gP=items.reduce((s,c)=>s+(c.valor_parcela||0),0);
     const gA=items.reduce((s,c)=>s+(c.credito_atualizado||0),0);
-    html+=`<tr class="sec-row"><td colspan="13">📌 ${ref} · ${items.length} cartas · Saldo: ${fmtR(gS)} · Créd.Tyago: ${fmtR(gC)}</td></tr>`;
+    tableHtml+=`<tr class="sec-row"><td colspan="13">📌 ${ref} · ${items.length} cartas · Saldo: ${fmtR(gS)} · Créd.Tyago: ${fmtR(gC)}</td></tr>`;
     items.forEach(c=>{
-      html+=`<tr>
+      tableHtml+=`<tr>
         <td style="font-weight:600">${c.garantia||'-'}</td>
         <td class="gray">${c.adm||'-'}</td><td class="gray">${c.grupo||'-'}</td>
         <td class="gray">${c.cota||'-'}</td>
@@ -677,20 +722,137 @@ function renderCartas(){
         <td class="r green">${fmtR(c.credito_tyago)}</td>
       </tr>`;
     });
-    html+=`<tr style="background:#1c2433"><td colspan="7" style="text-align:right;color:#6e7681;font-size:10px">Subtotal ${ref} →</td>
+    tableHtml+=`<tr style="background:#1c2433"><td colspan="7" style="text-align:right;color:#6e7681;font-size:10px">Subtotal ${ref} →</td>
       <td class="r" style="color:#79b8ff;font-weight:600">${fmtR(gA)}</td><td></td>
       <td class="r" style="color:#e3b341;font-weight:600">${fmtR(gP)}</td>
       <td class="r" style="color:#f85149;font-weight:600">${fmtR(gS)}</td><td></td>
       <td class="r" style="color:#3fb950;font-weight:600">${fmtR(gC)}</td></tr>`;
   }
-  html+=`</tbody>
+  tableHtml+=`</tbody>
     <tfoot><tr><td colspan="7" style="text-align:right">TOTAL GERAL →</td>
       <td class="r">${fmtR(totA)}</td><td></td>
       <td class="r">${fmtR(totP)}</td><td class="r">${fmtR(totS)}</td><td></td>
       <td class="r">${fmtR(totC)}</td>
     </tr></tfoot>
   </table></div>`;
-  document.getElementById('cartas').innerHTML=html;
+
+  // Build simulator cartas selection list
+  let simRows='';
+  car.forEach((c,i)=>{
+    simRows+=`<tr>
+      <td style="padding:4px 8px"><input type="checkbox" class="sim-cb" data-idx="${i}" onchange="calcSim()"></td>
+      <td style="font-weight:600;padding:4px 8px">${c.imovel_ref||'-'}</td>
+      <td style="padding:4px 8px;color:#8b949e">${c.garantia||'-'}</td>
+      <td style="padding:4px 8px;color:#8b949e">${c.adm||'-'} / ${c.grupo||'-'}</td>
+      <td style="padding:4px 8px;color:#8b949e">${c.cota||'-'}</td>
+      <td class="r" style="padding:4px 8px;color:#f85149">${fmtR(c.saldo_devedor)}</td>
+      <td class="r" style="padding:4px 8px;color:#3fb950">${fmtR(c.credito_atualizado)}</td>
+      <td class="r" style="padding:4px 8px;color:#e3b341">${fmtR(c.valor_parcela)}</td>
+      <td class="r" style="padding:4px 8px;color:#3fb950">${fmtR(c.credito_tyago)}</td>
+      <td class="r" style="padding:4px 8px;color:#8b949e">${c.prazo_a_pagar||'-'} m</td>
+    </tr>`;
+  });
+
+  const simHtml=`
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:18px">
+    <div class="edit-field"><label>Cliente</label><input type="text" id="sim-cli" placeholder="Nome do cliente" style="width:100%"></div>
+    <div class="edit-field"><label>Empreendimento</label><input type="text" id="sim-emp" placeholder="Nome do imóvel" style="width:100%"></div>
+    <div class="edit-field"><label>Valor do Imóvel (R$)</label><input type="number" id="sim-vim" step="1000" oninput="calcSim()" style="width:100%"></div>
+    <div class="edit-field"><label>Valor Negociado (R$)</label><input type="number" id="sim-vne" step="1000" oninput="calcSim()" style="width:100%"></div>
+    <div class="edit-field"><label>Entrada (R$)</label><input type="number" id="sim-ent" step="1000" oninput="calcSim()" style="width:100%"></div>
+    <div class="edit-field"><label>Permuta (R$)</label><input type="number" id="sim-per" step="1000" oninput="calcSim()" style="width:100%"></div>
+    <div class="edit-field"><label>Balão (R$)</label><input type="number" id="sim-bal" step="1000" oninput="calcSim()" style="width:100%"></div>
+  </div>
+  <div id="sim-results" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+    <div class="kcard"><div class="klabel">Cartas Selecionadas</div><div class="kval blue" id="sr-cnt">0</div></div>
+    <div class="kcard"><div class="klabel">Saldo Devedor Cartas</div><div class="kval red" id="sr-sd">R$ 0</div></div>
+    <div class="kcard"><div class="klabel">Crédito Atualizado</div><div class="kval" id="sr-ca">R$ 0</div></div>
+    <div class="kcard"><div class="klabel">Crédito Tyago</div><div class="kval green" id="sr-ct">R$ 0</div></div>
+    <div class="kcard"><div class="klabel">Parcela Mensal</div><div class="kval yellow" id="sr-pm">R$ 0</div></div>
+    <div class="kcard"><div class="klabel">Saldo Devedor Negócio</div><div class="kval" id="sr-sdn">R$ 0</div></div>
+    <div class="kcard"><div class="klabel">Dif. Garantia</div><div class="kval" id="sr-dg">R$ 0</div></div>
+    <div class="kcard"><div class="klabel">Limite 80% Imóvel</div><div class="kval gray" id="sr-lim">R$ 0</div></div>
+    <div class="kcard" id="sr-prova-card"><div class="klabel">Prova Real de Saldo</div><div class="kval" id="sr-pr">R$ 0</div><div class="ksub" id="sr-pr-lbl"></div></div>
+  </div>
+  <h3 style="margin-top:0;margin-bottom:10px">Selecione as cartas para usar nesta simulação</h3>
+  <div class="tw" style="max-height:340px">
+    <table style="width:100%">
+      <thead><tr style="background:#1c2128">
+        <th style="padding:6px 8px;font-size:10px;color:#8b949e">✓</th>
+        <th style="padding:6px 8px;font-size:10px;color:#8b949e">Empreend.</th>
+        <th style="padding:6px 8px;font-size:10px;color:#8b949e">Garantia</th>
+        <th style="padding:6px 8px;font-size:10px;color:#8b949e">ADM / Grupo</th>
+        <th style="padding:6px 8px;font-size:10px;color:#8b949e">Cota</th>
+        <th class="r" style="padding:6px 8px;font-size:10px;color:#8b949e">Saldo Dev.</th>
+        <th class="r" style="padding:6px 8px;font-size:10px;color:#8b949e">Créd.Atual.</th>
+        <th class="r" style="padding:6px 8px;font-size:10px;color:#8b949e">Parcela</th>
+        <th class="r" style="padding:6px 8px;font-size:10px;color:#8b949e">Créd.Tyago</th>
+        <th class="r" style="padding:6px 8px;font-size:10px;color:#8b949e">Prazo</th>
+      </tr></thead>
+      <tbody style="font-size:12px">${simRows}</tbody>
+    </table>
+  </div>`;
+
+  document.getElementById('cartas').innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:14px;border-bottom:1px solid #30363d;padding-bottom:10px">
+      <button id="ctab-ctrl" class="btn" style="background:#1f3666;border-color:#388bfd;color:#79b8ff" onclick="showCartaTab('ctrl')">📋 Controle de Cartas</button>
+      <button id="ctab-sim" class="btn" style="background:transparent;border-color:#30363d;color:#8b949e" onclick="showCartaTab('sim')">🧮 Simulador de Venda</button>
+    </div>
+    <div id="cartas-ctrl">${tableHtml}</div>
+    <div id="cartas-sim" style="display:none">${simHtml}</div>`;
+}
+
+function showCartaTab(tab){
+  document.getElementById('cartas-ctrl').style.display=tab==='ctrl'?'block':'none';
+  document.getElementById('cartas-sim').style.display=tab==='sim'?'block':'none';
+  const active='background:#1f3666;border-color:#388bfd;color:#79b8ff';
+  const idle='background:transparent;border-color:#30363d;color:#8b949e';
+  document.getElementById('ctab-ctrl').style.cssText=`${tab==='ctrl'?active:idle}`;
+  document.getElementById('ctab-sim').style.cssText=`${tab==='sim'?active:idle}`;
+}
+
+function calcSim(){
+  const cbs=document.querySelectorAll('.sim-cb:checked');
+  let sd=0,ca=0,ct=0,pm=0;
+  cbs.forEach(cb=>{
+    const c=S.cartas[parseInt(cb.dataset.idx)];
+    if(!c) return;
+    sd+=c.saldo_devedor||0;
+    ca+=c.credito_atualizado||0;
+    ct+=c.credito_tyago||0;
+    pm+=c.valor_parcela||0;
+  });
+  const vim=parseFloat(document.getElementById('sim-vim')?.value)||0;
+  const vne=parseFloat(document.getElementById('sim-vne')?.value)||0;
+  const ent=parseFloat(document.getElementById('sim-ent')?.value)||0;
+  const per=parseFloat(document.getElementById('sim-per')?.value)||0;
+  const bal=parseFloat(document.getElementById('sim-bal')?.value)||0;
+  const sdn=vne-ent-per-bal;
+  const dg=vne-sd;
+  const lim=vne*0.8;
+  const pr=ct-sdn;
+  const sv=id=>document.getElementById(id);
+  if(sv('sr-cnt')) sv('sr-cnt').textContent=cbs.length;
+  if(sv('sr-sd'))  sv('sr-sd').textContent=fmtR(sd);
+  if(sv('sr-ca'))  sv('sr-ca').textContent=fmtR(ca);
+  if(sv('sr-ct'))  sv('sr-ct').textContent=fmtR(ct);
+  if(sv('sr-pm'))  sv('sr-pm').textContent=fmtR(pm);
+  if(sv('sr-sdn')) sv('sr-sdn').textContent=fmtR(sdn);
+  if(sv('sr-dg')){
+    sv('sr-dg').textContent=fmtR(dg);
+    sv('sr-dg').className='kval '+(dg>=0?'green':'red');
+  }
+  if(sv('sr-lim')) sv('sr-lim').textContent=fmtR(lim);
+  if(sv('sr-pr')){
+    sv('sr-pr').textContent=fmtR(pr);
+    sv('sr-pr').className='kval '+(pr>=0?'green':'red');
+    if(sv('sr-pr-lbl')) sv('sr-pr-lbl').textContent=pr>=0?'✓ Crédito suficiente':'⚠ Ajustar composição';
+  }
+  if(sd>lim&&vim>0&&sv('sr-lim')){
+    sv('sr-lim').style.color='#f85149';
+  } else if(sv('sr-lim')){
+    sv('sr-lim').style.color='';
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════
